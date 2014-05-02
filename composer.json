@@ -1,0 +1,23 @@
+{
+    "name": "atlantis/core",
+    "description": "",
+    "authors": [
+        {
+            "name": "Azri Jamil",
+            "email": "azri@nematix.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.1.*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
+        "psr-0": {
+            "Atlantis\\Core\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
