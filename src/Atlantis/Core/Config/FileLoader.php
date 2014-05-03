@@ -2,38 +2,47 @@
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Config\FileLoader as BaseFileLoader;
-use Illuminate\Filesystem\Filesystem;
 
 
 class FileLoader extends BaseFileLoader {
-    protected $core_config;
-
-
-    public function __construct(Filesystem $files, $defaultPath){
-        parent::__construct($files,$defaultPath);
-
-        #i: Pre fetch Atlantis Core configs
-        $this->core_config = App::make('config')->get('core::app');
-    }
-
 
     public function load($environment, $group, $namespace = null){
-        $configs = parent::load($environment, $group, $namespace);
+        $items = array();
 
-        #i: Get setting path
-        $setting_path = $this->core_config['config']['setting_path'] . "/$namespace/";
-        $file_path = $setting_path . $group . '.json';
+        $path = $this->getPath($namespace);
 
-        #i: Check for setting file exist
-        if( \File::exists($file_path) ){
-            #i: Load for settings
-            $settings = json_decode(@file_get_contents($file_path)) ?: array();
-
-            #i: Merge settings with config
-            $configs = array_merge($configs,(array)$settings);
+        if (is_null($path)){
+            return $items;
         }
 
-        return $configs;
-    }
+        #i: Main config file
+        $file = "{$path}/{$group}.php";
+        if ($this->files->exists($file)){
+            $items = $this->files->getRequire($file);
+        }
 
+        #i: Environment specific
+        $file = "{$path}/{$environment}/{$group}.php";
+        if ($this->files->exists($file)){
+            $items = $this->mergeEnvironment($items, $file);
+        }
+
+        #i: Pre fetch Atlantis Core configs
+        $this->core_config = $this->getRequire(__DIR__ . '/../../../config/app.php');
+
+        #i: Get setting path
+        $setting_path = $this->core_config['config']['setting_path'];
+        $file = "$setting_path/{$namespace}/{$group}.json";
+
+        #i: Check for setting file exist
+        if( $this->files->exists($file) ){
+            #i: Load for settings
+            $settings = json_decode(@file_get_contents($file)) ?: array();
+
+            #i: Merge settings with config
+            $items = array_replace_recursive($items,(array)$settings);
+        }
+
+        return $items;
+    }
 }

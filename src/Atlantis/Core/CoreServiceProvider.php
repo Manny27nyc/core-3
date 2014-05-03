@@ -34,14 +34,6 @@ class CoreServiceProvider extends ServiceProvider {
             #i: Return provider instance
             return new Javascript\Provider($binder,$namespace);
         });
-
-        $this->app->bind('atlantis.config.fileloader', function($app){
-            #i: Get atlantis config file loader
-            $file_loader = new Config\FileLoader($app['files'], $app['path'].'/config');
-
-            #i: Replace default file loader
-            $app['config']->setLoader($file_loader);
-        });
 	}
 
     /**
@@ -59,11 +51,6 @@ class CoreServiceProvider extends ServiceProvider {
             'Atlantis\Core\Client\Facades\Javascript'
         );
 
-        #i: Activate Atlantis Config Fileloader
-        if( $this->app['config']->get('core::app.config.enable',true) ){
-            $this->app['atlantis.config.fileloader'];
-        }
-
         #e: Event trigger
         $this->app['events']->fire('atlantis.core.ready');
     }
@@ -75,7 +62,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('atlantis.client.javascript','atlantis.config.fileloader');
+		return array('atlantis.client.javascript');
 	}
 
 }
