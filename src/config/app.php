@@ -1,4 +1,4 @@
-<?php return array(
+<?php return [
 
 
     /*
@@ -17,4 +17,4 @@
 
     'copyright' => '<a href="http://atlantis.nematix.com">Nematix Corporation</a>',
 
-);
+];
