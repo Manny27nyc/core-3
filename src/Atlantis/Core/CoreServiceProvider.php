@@ -51,6 +51,9 @@ class CoreServiceProvider extends ServiceProvider {
             'Atlantis\Core\Client\Facades\Javascript'
         );
 
+        #i: Load events listener
+        include __DIR__.'/../../events.php';
+
         #e: Event trigger
         $this->app['events']->fire('atlantis.core.ready');
     }
