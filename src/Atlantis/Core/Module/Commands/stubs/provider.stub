@@ -1,0 +1,20 @@
+<?php namespace Modules;
+
+use Atlantis\Core\Module\ServiceProvider;
+
+
+class {{Name}}ServiceProvider extends ServiceProvider {
+    protected $title = 'Module Title';
+
+    public function register(){
+        parent::register('{{name}}');
+
+        #i: Register your service if any
+    }
+
+    public function boot(){
+        parent::boot('{{name}}');
+
+        #i: Misc task; register menu, migration and etc
+    }
+}

@@ -1,0 +1,9 @@
+<?php
+
+App::before(function($request){
+    #i: You can add your before request filter or task here.
+});
+
+App::after(function($request,$response){
+    #i: You can add your after request filter or task here.
+});

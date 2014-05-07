@@ -1,0 +1,7 @@
+<?php return [
+
+    #i: Module specific language
+    #   You can access you config by using Lang::get('module_name::module_name.general.title')
+    #
+
+];
