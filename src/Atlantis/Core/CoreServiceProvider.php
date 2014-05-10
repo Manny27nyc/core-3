@@ -123,11 +123,33 @@ class CoreServiceProvider extends ServiceProvider {
      * @return void
      */
     public function registerCommands(){
-        $this->app['atlantis.commands.module-make'] = $this->app->share(function($app){
-            return new Module\Commands\ModuleMakeCommand($app['atlantis.module'],$app['files']);
+        $this->app['atlantis.commands.module-migrate'] = $this->app->share(function($app){
+            return new Module\Commands\ModuleCommandMigrate($app['atlantis.module']);
         });
 
-        $this->commands('atlantis.commands.module-make');
+        $this->app['atlantis.commands.module-seed'] = $this->app->share(function($app){
+            return new Module\Commands\ModuleCommandSeed($app['atlantis.module']);
+        });
+
+        $this->app['atlantis.commands.module-seed-make'] = $this->app->share(function($app){
+            return new Module\Commands\ModuleCommandSeedMake($app['atlantis.module'],$app['files']);
+        });
+
+        $this->app['atlantis.commands.module-controller'] = $this->app->share(function($app){
+            return new Module\Commands\ModuleCommandController($app['atlantis.module']);
+        });
+
+        $this->app['atlantis.commands.module-make'] = $this->app->share(function($app){
+            return new Module\Commands\ModuleCommandMake($app['atlantis.module'],$app['files']);
+        });
+
+        $this->commands(
+            'atlantis.commands.module-migrate',
+            'atlantis.commands.module-seed',
+            'atlantis.commands.module-seed-make',
+            'atlantis.commands.module-controller',
+            'atlantis.commands.module-make'
+        );
     }
 
 

@@ -6,7 +6,8 @@ use Illuminate\Filesystem\Filesystem as File;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ModuleMakeCommand extends Command {
+
+class ModuleCommandMake extends Command {
 
     /**
      * The console command name.
@@ -107,8 +108,8 @@ class ModuleMakeCommand extends Command {
     {
         $this->generateFolders();
         $this->generateFiles();
-        //$this->call('module:seed:make', ['module' => $this->name, 'seeder' => $this->Name, '--master']);
-        //$this->call('module:controller', ['module' => $this->name, 'controller' => $this->Name . 'Controller']);
+        $this->call('module:seed:make', ['module' => $this->name, 'seeder' => $this->Name, '--master']);
+        $this->call('module:controller', ['module' => $this->name, 'controller' => $this->Name . 'Controller']);
         $this->info("Module [$this->name] has been created successfully.");
     }
 
