@@ -102,15 +102,16 @@ class Environment {
 
 
     /**
-     * Get all available modules
+     * Get all available modules including enabled module
      *
      * @return array
      */
     public function available(){
+        #i: Modules array & base path
         $modules = [];
-
         $module_base = $this->app['config']->get('core::module.base',base_path().'/modules');
 
+        #i: Scanning folder for modules
         foreach( glob("$module_base/*",GLOB_ONLYDIR) as $dir ){
             #i: Get module name from directory
             $module_name = strtolower(basename($dir));
@@ -129,6 +130,7 @@ class Environment {
             }
         }
 
+        #i: Merge with modules array
         $modules = array_merge($modules,$this->modules);
 
         return $modules;
@@ -141,20 +143,37 @@ class Environment {
      * @return array
      */
     public function register(){
-        foreach($this->all() as $module){
+        foreach($this->all() as $name => $module){
             #i: Register service provider
             if( $module['enable'] ){
-                $this->app->register('Modules\\'.$module['provider']);
+                #i: Provider class path
+                $class_name = studly_case($name);
+                $class_path = "Modules\\$class_name\\".$module['provider'];
+
+                #i: Registering class
+                $this->app->register($class_path);
+
+                #i: Merging info from class
+                $this->modules[$name] = array_merge_recursive($module,$this->app["modules.$name"]->info());
             };
         }
     }
 
 
+    /**
+     *
+     * @return mixed
+     */
     protected function moduleBase(){
         return $this->app['config']->get('core::module.base', base_path().'/modules');;
     }
 
 
+    /**
+     *
+     *
+     * @return array
+     */
     protected function object_to_array($obj){
         $arrObj = is_object($obj) ? get_object_vars($obj) : $obj;
         foreach ($arrObj as $key => $val) {

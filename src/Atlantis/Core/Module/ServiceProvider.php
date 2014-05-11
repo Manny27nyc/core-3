@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 abstract class ServiceProvider extends BaseServiceProvider {
     protected $module_name;
     protected $title;
-
+    protected $defer = false;
 
     /**
      *
@@ -32,6 +32,17 @@ abstract class ServiceProvider extends BaseServiceProvider {
     }
 
 
+    public function provides(){
+        return ['modules'.$this->module_name];
+    }
+
+
+    public function info(){
+        return [
+            'title' => $this->title
+        ];
+    }
+
     /**
      *
      *
@@ -53,6 +64,12 @@ abstract class ServiceProvider extends BaseServiceProvider {
     protected function moduleRegister($module_name){
         #i: Registering package
         $this->package("modules/$module_name", "modules.$module_name", $this->modulePath());
+
+        $this->app->bind("modules.$module_name", function($app) use($module_name){
+            $module_name = studly_case($module_name);
+            $module_class = "Modules\\$module_name\\$module_name".'ServiceProvider';
+            return new $module_class($app);
+        });
     }
 
 
