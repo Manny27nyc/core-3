@@ -1,9 +1,9 @@
-<?php namespace Atlantis\Core\Module\Facades;
+<?php namespace Atlantis\Core\Client\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
 
-class Module extends Facade {
+class Client extends Facade {
 
     /**
      * Name of the binding in the IoC container
@@ -12,7 +12,7 @@ class Module extends Facade {
      */
     protected static function getFacadeAccessor()
     {
-        return 'atlantis.module';
+        return 'atlantis.client';
     }
 
-}
+} 

@@ -1,6 +1,8 @@
 <?php namespace Atlantis\Core\Controller;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Db;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
@@ -11,19 +13,23 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Controller;
+
 
 
 class BaseController extends Controller {
     /**-----------------------------------------------------------------------------------------------------------------
      * Global Attributes
      -----------------------------------------------------------------------------------------------------------------*/
-    protected $user;
-    protected $user_realm;
-    protected $superuser;
+    protected $layout = 'admin::layouts.common';
+    protected $environment;
     protected $route_name;
 
-    protected $layout = 'admin::layouts.common';
+
+    public function __construct(){
+        $this->environment = App::make('atlantis.controller');
+    }
 
 
 	/*******************************************************************************************************************
@@ -40,20 +46,36 @@ class BaseController extends Controller {
             $this->layout->page = false;
 		}
 
-        #i: Current User
-        if( \Sentry::getUser() ){
-            $this->user = \Sentry::getUser();
-            $this->user_realm = \Atlantis::users()->getUserRealmById($this->user->id)->name;
-        }
-
-        #i: Superuser
-        $superuser = \Sentry::findAllUsersWithAccess('superuser')[0];
-        if( $superuser ){
-            $this->superuser = $superuser;
-        }
-
         #i: Current route name
-        $this->route_name = \Route::currentRouteName();
+        $this->route_name = Route::currentRouteName();
 	}
+
+
+    /*******************************************************************************************************************
+     *
+     *
+     * @return mixed
+     ******************************************************************************************************************/
+    public function __call($name, $arguments){
+        if( $this->environment->extension($name) ){
+            return call_user_func_array($name, $arguments);
+        }
+
+        return null;
+    }
+
+
+    /*******************************************************************************************************************
+     *
+     *
+     * @return mixed
+     ******************************************************************************************************************/
+    public function __get($name){
+        if( $this->environment->attribute($name) ){
+            return $this->environment->attribute($name);
+        }
+
+        return null;
+    }
 
 }

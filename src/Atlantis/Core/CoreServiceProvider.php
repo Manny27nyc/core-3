@@ -1,8 +1,27 @@
 <?php namespace Atlantis\Core;
+/**
+ * Part of the Atlantis package.
+ *
+ * NOTICE OF LICENSE
+ *
+ * Licensed under the 3-clause BSD License.
+ *
+ * This source file is subject to the 3-clause BSD License that is
+ * bundled with this package in the LICENSE file.  It is also available at
+ * the following URL: http://www.opensource.org/licenses/BSD-3-Clause
+ *
+ * @package    Atlantis
+ * @version    1.0.0
+ * @author     Nematix LLC
+ * @license    BSD License (3-clause)
+ * @copyright  (c) 1997 - 2013, Nematix LLC
+ * @link       http://nematix.com
+ */
 
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 use Atlantis\Core\Client\Javascript;
+use Atlantis\Core\Client;
 use Atlantis\Core\View;
 use Atlantis\Core\Config;
 use Atlantis\Core\Module;
@@ -68,7 +87,7 @@ class CoreServiceProvider extends ServiceProvider {
      * @return void
      */
     public function registerServiceClient(){
-        $this->app->bind('atlantis.client.javascript',function($app){
+        $this->app['atlantis.client.javascript'] = $this->app->share(function($app){
             #i: Get configs
             $view = $app['config']->get('core::client.javascript.bind');
             $namespace = $app['config']->get('core::client.javascript.namespace');
@@ -78,6 +97,12 @@ class CoreServiceProvider extends ServiceProvider {
 
             #i: Return provider instance
             return new Javascript\Provider($binder,$namespace);
+        });
+
+        $this->app['atlantis.client'] = $this->app->share(function($app){
+            $javascript = $app['atlantis.client.javascript'];
+
+            return new Client\Environment($javascript);
         });
     }
 
@@ -99,10 +124,10 @@ class CoreServiceProvider extends ServiceProvider {
      */
     public function startLoadAliases(){
         #i: Automatic Alias loader
-        AliasLoader::getInstance()->alias(
+        /*AliasLoader::getInstance()->alias(
             'Javascript',
             'Atlantis\Core\Client\Facades\Javascript'
-        );
+        );*/
     }
 
 
@@ -160,7 +185,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('atlantis.module','atlantis.client.javascript');
+		return array('atlantis.module','atlantis.client');
 	}
 
 }

@@ -9,7 +9,7 @@
 
 App::before(function($request)
 {
-    Javascript::put(array(
+    Client::javascript()->put(array(
         'appBase' => url('/') . '/'
     ));
 });
