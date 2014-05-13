@@ -147,9 +147,9 @@ class ModuleCommandMake extends Command {
      */
     protected function generateFolders()
     {
-        $this->file->makeDirectory($this->getModulePath($this->Name));
+        $this->file->makeDirectory($this->getModulePath($this->name));
         foreach ($this->folders as $folder) {
-            $this->file->makeDirectory($this->getModulePath($this->Name) . $folder);
+            $this->file->makeDirectory($this->getModulePath($this->name) . $folder);
         }
     }
 
