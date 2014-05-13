@@ -48,6 +48,7 @@ class CoreServiceProvider extends ServiceProvider {
         $this->registerServiceModule();
         $this->registerServiceClient();
         $this->registerCommands();
+        $this->registerAlias();
 	}
 
 
