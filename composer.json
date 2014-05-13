@@ -1,15 +1,35 @@
 {
     "name": "atlantis/core",
-    "description": "",
+    "description": "Atlantis Framework : Core",
+    "keywords": ["core","administrator", "admin", "database", "atlantis", "laravel", "cms", "enterprise"],
     "authors": [
         {
             "name": "Azri Jamil",
             "email": "azri@nematix.com"
         }
     ],
+    "repositories": [
+        {
+            "type":"vcs",
+            "url": "https://github.com/Marwelln/basset"
+        }
+    ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.1.*"
+        "php": ">=5.4",
+        "illuminate/support": "4.1.*",
+        "rhumsaa/uuid": "2.8.*@dev",
+        "components/jquery": "*",
+        "components/angular.js": "dev-master",
+        "components/bootstrap": "dev-master",
+        "jasonlewis/basset": "dev-master",
+        "barryvdh/assetic-filters": "dev-master",
+        "natxet/CssMin": "dev-master",
+        "mrclay/minify": "dev-master",
+        "leafo/lessphp": "0.4.*@dev",
+        "leafo/scssphp": "dev-master",
+        "leafo/scssphp-compass": "dev-master",
+        "coffeescript/coffeescript": "dev-master",
+        "anahkiasen/former": "dev-master"
     },
     "autoload": {
         "classmap": [
@@ -19,5 +39,13 @@
             "Atlantis\\Core\\": "src/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "config": {
+        "preferred-install": "dist",
+        "component-dir": "public/components",
+        "component-baseurl": "/components",
+        "github-oauth":{
+            "github.com": "690bfbbcecd5606d63605f14e4aa773e431568be"
+        }
+    }
 }

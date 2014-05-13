@@ -44,6 +44,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+        $this->registerDependencies();
         $this->registerServiceModule();
         $this->registerServiceClient();
         $this->registerCommands();
@@ -66,6 +67,31 @@ class CoreServiceProvider extends ServiceProvider {
         #e: Event trigger
         $this->app['events']->fire('atlantis.core.ready');
     }
+
+
+    /**
+     *
+     *
+     * @return void
+     */
+    public function registerDependencies(){
+        $this->app->register('Basset\BassetServiceProvider');
+        $this->app->register('Former\FormerServiceProvider');
+    }
+
+
+    /**
+     *
+     *
+     * @return void
+     */
+    public function registerAlias(){
+        $alias = AliasLoader::getInstance();
+
+        $alias->alias('Basset','Basset\Facade');
+        $alias->alias('Former','Former\Facades\Former');
+    }
+
 
 
     /**
@@ -123,11 +149,9 @@ class CoreServiceProvider extends ServiceProvider {
      * @return void
      */
     public function startLoadAliases(){
-        #i: Automatic Alias loader
-        /*AliasLoader::getInstance()->alias(
-            'Javascript',
-            'Atlantis\Core\Client\Facades\Javascript'
-        );*/
+        //$alias = AliasLoader::getInstance();
+
+        //$alias->alias('Javascript','Atlantis\Core\Client\Facades\Javascript');
     }
 
 
