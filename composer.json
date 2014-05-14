@@ -29,6 +29,7 @@
         "leafo/scssphp": "dev-master",
         "leafo/scssphp-compass": "dev-master",
         "coffeescript/coffeescript": "dev-master",
+        "anahkiasen/underscore-php" : "dev-master",
         "anahkiasen/former": "dev-master"
     },
     "autoload": {
