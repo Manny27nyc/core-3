@@ -61,7 +61,7 @@ class CoreServiceProvider extends ServiceProvider {
     {
         $this->package('atlantis/core');
 
-        $this->startLoadAliases();
+        #i: Boot loading
         $this->startLoadModules();
         $this->startLoadSupport();
 
@@ -141,18 +141,6 @@ class CoreServiceProvider extends ServiceProvider {
      */
     public function startLoadModules(){
         $this->app['atlantis.module']->register();
-    }
-
-
-    /**
-     *
-     *
-     * @return void
-     */
-    public function startLoadAliases(){
-        //$alias = AliasLoader::getInstance();
-
-        //$alias->alias('Javascript','Atlantis\Core\Client\Facades\Javascript');
     }
 
 
