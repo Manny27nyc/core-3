@@ -12,6 +12,10 @@
         {
             "type":"vcs",
             "url": "https://github.com/Marwelln/basset"
+        },
+        {
+            "type":"vcs",
+            "url": "https://github.com/wajatimur/former"
         }
     ],
     "require": {
