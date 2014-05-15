@@ -76,6 +76,7 @@ class CoreServiceProvider extends ServiceProvider {
      * @return void
      */
     public function registerDependencies(){
+        $this->app->register('Atlantis\Core\Config\ServiceProvider');
         $this->app->register('Basset\BassetServiceProvider');
         $this->app->register('Former\FormerServiceProvider');
     }
