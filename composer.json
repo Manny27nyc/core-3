@@ -37,7 +37,8 @@
             "src/migrations"
         ],
         "psr-0": {
-            "Atlantis\\Core\\": "src/"
+            "Atlantis\\Core\\": "src/",
+            "Atlantis\\Helpers\\": "src/"
         }
     },
     "minimum-stability": "stable",

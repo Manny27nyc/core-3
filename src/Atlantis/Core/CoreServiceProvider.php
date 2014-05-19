@@ -18,6 +18,7 @@
  * @link       http://nematix.com
  */
 
+use Atlantis\Helpers\String;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 use Atlantis\Core\Client\Javascript;
@@ -25,6 +26,7 @@ use Atlantis\Core\Client;
 use Atlantis\Core\View;
 use Atlantis\Core\Config;
 use Atlantis\Core\Module;
+use Atlantis\Helpers\Environment;
 
 
 class CoreServiceProvider extends ServiceProvider {
@@ -47,6 +49,7 @@ class CoreServiceProvider extends ServiceProvider {
         $this->registerDependencies();
         $this->registerServiceModule();
         $this->registerServiceClient();
+        $this->registerServiceHelpers();
         $this->registerCommands();
         $this->registerAlias();
 	}
@@ -87,13 +90,13 @@ class CoreServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function registerAlias(){
-        $alias = AliasLoader::getInstance();
+    public function registerServiceHelpers(){
+        $this->app['atlantis.helpers'] = $this->app->share(function($app){
+            return new Environment();
+        });
 
-        $alias->alias('Basset','Basset\Facade');
-        $alias->alias('Former','Former\Facades\Former');
+        $this->app['atlantis.helpers']->extend('string', new String());
     }
-
 
 
     /**
@@ -132,6 +135,19 @@ class CoreServiceProvider extends ServiceProvider {
 
             return new Client\Environment($javascript);
         });
+    }
+
+
+    /**
+     *
+     *
+     * @return void
+     */
+    public function registerAlias(){
+        $alias = AliasLoader::getInstance();
+
+        $alias->alias('Basset','Basset\Facade');
+        $alias->alias('Former','Former\Facades\Former');
     }
 
 
@@ -199,7 +215,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('atlantis.module','atlantis.client');
+		return array('atlantis.helpers','atlantis.module','atlantis.client');
 	}
 
 }
