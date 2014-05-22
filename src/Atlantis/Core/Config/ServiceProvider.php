@@ -25,6 +25,7 @@ class ServiceProvider extends BaseServiceProvider {
         #i: Get atlantis config file loader
         $file_loader = new Config\FileLoader($this->app['files'], $this->app['path'].'/config');
 
+        #i: Register the new file loader
         $this->app->instance('config', $config = new Repository(
             $file_loader, $this->app['env']
         ));
