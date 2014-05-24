@@ -22,7 +22,7 @@ class BaseController extends Controller {
     /**-----------------------------------------------------------------------------------------------------------------
      * Global Attributes
      -----------------------------------------------------------------------------------------------------------------*/
-    protected $layout = 'admin::layouts.common';
+    protected $layout = 'core::layouts.common';
     protected $environment;
     protected $route_name;
 

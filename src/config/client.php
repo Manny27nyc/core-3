@@ -10,7 +10,7 @@
         | you want to prepend the JavaScript variables to.
         |
         */
-        'bind' => 'admin::layouts.common',
+        'bind' => 'core::layouts.common',
 
         /*
         |--------------------------------------------------------------------------
