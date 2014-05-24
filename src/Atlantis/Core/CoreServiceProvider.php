@@ -26,6 +26,7 @@ use Atlantis\Core\Client;
 use Atlantis\Core\View;
 use Atlantis\Core\Config;
 use Atlantis\Core\Module;
+use Atlantis\Core\Theme;
 use Atlantis\Helpers\Environment;
 
 
@@ -49,6 +50,7 @@ class CoreServiceProvider extends ServiceProvider {
         $this->registerDependencies();
         $this->registerServiceModule();
         $this->registerServiceClient();
+        $this->registerServiceTheme();
         $this->registerServiceHelpers();
         $this->registerCommands();
         $this->registerAlias();
@@ -117,6 +119,19 @@ class CoreServiceProvider extends ServiceProvider {
      *
      * @return void
      */
+    public function registerServiceTheme(){
+        #i: Registering Module environment for facade
+        $this->app['atlantis.theme'] = $this->app->share(function($app){
+            return new Theme\Environment($app['config'],$app['files'],$app['basset']);
+        });
+    }
+
+
+    /**
+     *
+     *
+     * @return void
+     */
     public function registerServiceClient(){
         $this->app['atlantis.client.javascript'] = $this->app->share(function($app){
             #i: Get configs
@@ -169,6 +184,9 @@ class CoreServiceProvider extends ServiceProvider {
     public function startLoadSupport(){
         #i: Load events listener
         include __DIR__.'/../../events.php';
+
+        #i: Load views composer
+        include __DIR__.'/../../views.php';
     }
 
 
@@ -215,7 +233,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('atlantis.helpers','atlantis.module','atlantis.client');
+		return array('atlantis.helpers','atlantis.module','atlantis.client','atlantis.theme');
 	}
 
 }
