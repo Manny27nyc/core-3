@@ -19,8 +19,10 @@
         "illuminate/support": "4.1.*",
         "rhumsaa/uuid": "2.8.*@dev",
         "components/jquery": "*",
+        "components/jqueryui": "dev-master",
         "components/angular.js": "dev-master",
         "components/bootstrap": "dev-master",
+        "components/font-awesome": "4.0.*@dev",
         "jasonlewis/basset": "dev-master",
         "barryvdh/assetic-filters": "dev-master",
         "natxet/CssMin": "dev-master",
@@ -44,7 +46,7 @@
     "minimum-stability": "stable",
     "config": {
         "preferred-install": "dist",
-        "component-dir": "public/components",
+        "component-dir": "../../../public/components",
         "component-baseurl": "/components",
         "github-oauth":{
             "github.com": "690bfbbcecd5606d63605f14e4aa773e431568be"
