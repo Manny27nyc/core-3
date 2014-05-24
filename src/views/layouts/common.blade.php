@@ -15,7 +15,7 @@
     @show
 </head>
 <body>
-@include('layouts.partials.iesupport')
+@include('core::partials.iesupport')
 
 <!-- Navbar & Sidebar Section
 ================================================== -->
@@ -30,13 +30,13 @@
 @section('base')
 <div id="wrap">
     @if (isset($errors) && count($errors->all()) > 0)
-        @include('layouts.partials.error')
+        @include('core::partials.error')
     @endif
     @yield('content')
 </div>
 @show
 
-@include('layouts.partials.footer')
+@include('core::partials.footer')
 
 <!-- JavaScripts
 ================================================== -->
