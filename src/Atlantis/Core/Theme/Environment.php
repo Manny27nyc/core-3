@@ -3,6 +3,7 @@
 
 class Environment {
     protected $config;
+    protected $view;
     protected $files;
     protected $assets = [];
     protected $themes_base_path;
@@ -23,8 +24,9 @@ class Environment {
     );
 
 
-    public function __construct($config,$files,$assets){
+    public function __construct($config,$view,$files,$assets){
         $this->config = $config;
+        $this->view = $view;
         $this->files = $files;
         $this->assets = $assets;
 
@@ -48,6 +50,9 @@ class Environment {
 
         #i: Add theme to config path, for later flexible access
         $this->config->addNamespace("themes/$theme","{$this->themes_base_path}/$theme/");
+
+        #i: Add theme view to global namespace
+        $this->view->addNamespace("themes/$theme","{$this->themes_base_path}/$theme/views/");
 
         #i: Fetch theme configs
         $configs = $this->config->get('themes/default::config');
