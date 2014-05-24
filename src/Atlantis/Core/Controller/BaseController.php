@@ -28,7 +28,9 @@ class BaseController extends Controller {
 
 
     public function __construct(){
-        $this->environment = App::make('atlantis.controller');
+        //$this->environment = App::make('atlantis.controller');
+
+        App::make('atlantis.theme')->load();
     }
 
 
