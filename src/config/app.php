@@ -33,7 +33,7 @@
     */
     'theme' => array(
         'default'       => 'default',
-        'base_path'     => base_path() . '/themes'
+        'base_path'     => public_path() . '/themes'
     ),
 
     'copyright' => '<a href="http://atlantis.nematix.com">Nematix Corporation</a>',
