@@ -52,6 +52,7 @@ class CoreServiceProvider extends ServiceProvider {
         $this->registerServiceClient();
         $this->registerServiceTheme();
         $this->registerServiceHelpers();
+        $this->registerConfigOverride();
         $this->registerCommands();
         $this->registerAlias();
 	}
@@ -152,6 +153,10 @@ class CoreServiceProvider extends ServiceProvider {
         });
     }
 
+
+    public function registerConfigOverride(){
+        $this->app['config']->override('basset','config',__DIR__.'/../../config/basset');
+    }
 
     /**
      *

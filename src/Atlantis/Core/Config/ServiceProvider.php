@@ -1,7 +1,6 @@
 <?php namespace Atlantis\Core\Config;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Illuminate\Config\Repository;
 use Illuminate\Filesystem\Filesystem;
 use Atlantis\Core\Config;
 
