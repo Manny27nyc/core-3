@@ -27,10 +27,7 @@
         "barryvdh/assetic-filters": "dev-master",
         "natxet/CssMin": "dev-master",
         "mrclay/minify": "dev-master",
-        "leafo/lessphp": "0.4.*@dev",
-        "leafo/scssphp": "dev-master",
-        "leafo/scssphp-compass": "dev-master",
-        "coffeescript/coffeescript": "dev-master",
+        "oyejorge/less.php": "~1.5",
         "anahkiasen/underscore-php" : "dev-master",
         "anahkiasen/former": "dev-master"
     },
