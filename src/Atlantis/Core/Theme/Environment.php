@@ -31,7 +31,6 @@ class Environment {
         $this->assets = $assets;
 
         $this->themes_base_path = $this->config->get('core::app.theme.base_path');
-
         $this->locale = $config->get('app.locale');
     }
 
@@ -55,22 +54,27 @@ class Environment {
         $this->view->addNamespace("themes/$theme","{$this->themes_base_path}/$theme/views/");
 
         #i: Fetch theme configs
-        $configs = $this->config->get('themes/default::config');
+        $configs = $this->config->get("themes/$theme::config");
 
         #i: Validate theme config structure
         // Later !!
 
+        #i: Template inheritance
+        if( isset($configs['info']['inherit']) ){
+            $this->load($configs['info']['inherit']);
+        }
+
         #i: Load prefixes
-        if( isset($configs['register']['prefixes']) ) $this->theme_prefixes = $configs['register']['prefixes'];
+        if( isset($configs['register']['prefixes']) ) $this->theme_prefixes[$theme] = $configs['register']['prefixes'];
 
         #i: Load attributes
-        if( isset($configs['register']['attributes']) ) $this->theme_attributes = $configs['register']['attributes'];
+        if( isset($configs['register']['attributes']) ) $this->theme_attributes[$theme] = $configs['register']['attributes'];
 
         #i: Register stylesheet to load
-        if( isset($configs['assets']['stylesheet']) ) $this->registerStylesheet($configs['assets']['stylesheet']);
+        if( isset($configs['assets']['stylesheet']) ) $this->registerStylesheet($configs['assets']['stylesheet'],$theme);
 
         #i: Register javascript to load
-        if( isset($configs['assets']['javascript']) ) $this->registerJavascript($configs['assets']['javascript']);
+        if( isset($configs['assets']['javascript']) ) $this->registerJavascript($configs['assets']['javascript'],$theme);
 
         #i: Boot stylesheet with asset provider
         $this->bootStylesheet($this->theme_stylesheets);
@@ -84,17 +88,17 @@ class Environment {
 
     public function registerStylesheet($assets_css=[],$theme=null){
         #i: Get default theme name if not supplied
-        if(empty($theme)) $theme =  $this->config->get('core::app.theme.default');
+        if(!isset($theme)) $theme =  $this->config->get('core::app.theme.default');
 
         foreach($assets_css as $css){
             #i: Check if value contain array
             if( is_array($css) ){
-                $this->registerStylesheet($css);
+                $this->registerStylesheet($css,$theme);
                 continue;
             }
 
             #i: Apply prefix
-            $css = $this->applyPrefix($css);
+            $css = $this->applyPrefix($css,$theme);
 
             if($this->files->isFile($css)){
                 #i: Add to stylesheet collection
@@ -107,11 +111,15 @@ class Environment {
 
             }else{
                 #i: Guess if css path if it in components
-                //$css_path = $this->config->get('core::app.component.base_path') . "/$css";
                 $css_path = "{$this->themes_base_path}/$theme/assets/$css";
 
                 #i: If css file exist then add
-                if( $this->files->isFile($css_path) ) $this->theme_stylesheets[] = $css_path;
+                if( $this->files->isFile($css_path) ){
+                    $this->theme_stylesheets[] = $css_path;
+
+                }elseif($this->files->isDirectory($css_path)){
+                    $this->registerStylesheet(glob("$css_path/*.{css,less}",GLOB_BRACE),$theme);
+                }
             }
         }
     }
@@ -137,18 +145,18 @@ class Environment {
 
     public function registerJavascript($assets_js=[],$theme=null){
         #i: Get default theme name if not supplied
-        if(empty($theme)) $theme =  $this->config->get('core::app.theme.default');
+        if(!isset($theme)) $theme =  $this->config->get('core::app.theme.default');
 
         #i: Process all javascripts
         foreach($assets_js as $js){
             #i: Check if value contain array
             if( is_array($js) ){
-                $this->registerJavascript($js);
+                $this->registerJavascript($js,$theme);
                 continue;
             }
 
             #i: Apply prefix
-            $js = $this->applyPrefix($js);
+            $js = $this->applyPrefix($js,$theme);
 
             if($this->files->isFile($js)){
                 #i: Add to stylesheet collection
@@ -161,11 +169,15 @@ class Environment {
 
             }else{
                 #i: Guess if css path if it in components
-                //$js_path = $this->config->get('core::app.component.base_path') . "/$js";
                 $js_path = "{$this->themes_base_path}/$theme/assets/$js";
 
                 #i: If css file exist then add
-                if( $this->files->isFile($js_path) ) $this->theme_javascripts[] = $js_path;
+                if( $this->files->isFile($js_path) ){
+                    $this->theme_javascripts[] = $js_path;
+
+                }elseif($this->files->isDirectory($js_path)){
+                    $this->registerJavascript(glob("$js_path/*.{js}",GLOB_BRACE),$theme);
+                }
             }
         }
     }
@@ -177,7 +189,7 @@ class Environment {
                 $file_extension = $this->files->extension($javascript);
 
                 if( $file_extension == 'js' ){
-                    $collection->javascript($javascript);
+                    $collection->javascript($javascript)->raw();
                 }else{
                     $collection->javascript($javascript)->apply(studly_case($file_extension));
                 }
@@ -186,8 +198,10 @@ class Environment {
     }
 
 
-    public function applyPrefix($value){
-        $prefixes = $this->theme_prefixes;
+    public function applyPrefix($value,$theme=null){
+        if(empty($theme)) $theme =  $this->config->get('core::app.theme.default');
+
+        $prefixes = $this->theme_prefixes[$theme];
 
         #i: Find all prefix in value string
         preg_match_all('/\w+[!]/',$value,$matches);
