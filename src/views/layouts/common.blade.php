@@ -36,13 +36,18 @@
 </div>
 @show
 
-@include('core::partials.footer')
-
 <!-- JavaScripts
 ================================================== -->
 @yield('_javascript')
 @section('javascript')
     @javascripts('common')
+    <script>
+        $(document).ready(function(){
+            angular.element(document).ready(function() {
+                angular.bootstrap(document, ['asng']);
+            });
+        });
+    </script>
 @show
 
 </body>

@@ -1,4 +1,4 @@
-<div id="footer" class="visible-md visible-lg navbar-fixed-bottom">
+<div id="footer" class="hidden-xs">
     <div class="container">
         <p class="credit text-center">
             {{ trans('general.text.browser') }}<br>
