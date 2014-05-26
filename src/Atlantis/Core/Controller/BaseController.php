@@ -17,22 +17,31 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Controller;
 
 
-
 class BaseController extends Controller {
     /**-----------------------------------------------------------------------------------------------------------------
-     * Global Attributes
+     * Traits
+    -----------------------------------------------------------------------------------------------------------------*/
+    use \Atlantis\Core\Theme\Traits\Controller;
+
+    /**-----------------------------------------------------------------------------------------------------------------
+     * Global Overridable Attributes
      -----------------------------------------------------------------------------------------------------------------*/
+    protected $theme;
     protected $layout = 'core::layouts.common';
-    protected $environment;
-    protected $route_name;
+
+    /**-----------------------------------------------------------------------------------------------------------------
+     * Global Attributes
+    -----------------------------------------------------------------------------------------------------------------*/
+    private $environment;
+    private $route_name;
 
 
     public function __construct(){
         #i: Get controller provider
         $this->environment = App::make('atlantis.controller');
 
-        #i: Load theme core
-        App::make('atlantis.theme')->load('core');
+        #i: Boot a theme
+        $this->themeBoot($this->theme);
     }
 
 

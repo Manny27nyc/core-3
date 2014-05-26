@@ -201,6 +201,7 @@ class Environment {
     public function applyPrefix($value,$theme=null){
         if(empty($theme)) $theme =  $this->config->get('core::app.theme.default');
 
+        #i: Get registered prefixes for theme
         $prefixes = $this->theme_prefixes[$theme];
 
         #i: Find all prefix in value string
