@@ -26,13 +26,14 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Atlantis Components
+    | Atlantis Theme
     |--------------------------------------------------------------------------
     |
     |
     */
     'theme' => array(
         'default'       => 'default',
+        'current'       => 'default',
         'base_path'     => public_path() . '/themes'
     ),
 

@@ -44,8 +44,10 @@ class Environment {
         #i: Construct theme config file
         $theme_config_path = "{$this->themes_base_path}/$theme/config.php";
 
-        #i: Check theme with config file exist
-        if( !$this->files->exists($theme_config_path) ) return null;
+        #i: Check theme with config file exist, if not load default
+        if( !$this->files->exists($theme_config_path) ) {
+            return $this->load($this->config->get('core::app.theme.default'));
+        }
 
         #i: Add theme to config path, for later flexible access
         $this->config->addNamespace("themes/$theme","{$this->themes_base_path}/$theme/");
