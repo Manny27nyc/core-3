@@ -29,9 +29,7 @@
 ================================================== -->
 @section('base')
 <div id="wrap">
-    @if (isset($errors) && count($errors->all()) > 0)
-        @include('core::partials.error')
-    @endif
+    @include('core::partials.error')
     @yield('content')
 </div>
 @show
