@@ -41,7 +41,7 @@
             "Atlantis\\Helpers\\": "src/"
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "config": {
         "preferred-install": "dist",
         "component-dir": "../../../public/components",
