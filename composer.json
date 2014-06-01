@@ -8,6 +8,7 @@
             "email": "azri@nematix.com"
         }
     ],
+    "license": "MIT",
     "repositories": [
         {
             "type":"vcs",
@@ -44,9 +45,6 @@
     "config": {
         "preferred-install": "dist",
         "component-dir": "../../../public/components",
-        "component-baseurl": "/components",
-        "github-oauth":{
-            "github.com": "690bfbbcecd5606d63605f14e4aa773e431568be"
-        }
+        "component-baseurl": "/components"
     }
 }
