@@ -43,7 +43,7 @@ class Binder implements BinderInterface {
         }else{
             $this->event->listen("composing: {$this->viewToBindVariables}", function($view) use ($js)
             {
-                $view->getEnvironment()->inject('_javascript',"<script>{$js}</script>");
+                $view->getFactory()->inject('_javascript',"<script>{$js}</script>");
             });
         }
     }
