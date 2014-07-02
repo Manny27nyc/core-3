@@ -1,5 +1,9 @@
 <?php namespace Atlantis\Core\Theme;
 
+use Assetic\Asset\AssetCollection;
+use Assetic\Asset\FileAsset;
+use Assetic\Asset\GlobAsset;
+
 
 class Environment {
     protected $config;
@@ -24,6 +28,13 @@ class Environment {
     );
 
 
+    /**
+     * Class Constructor
+     * @param $config
+     * @param $view
+     * @param $files
+     * @param $assets
+     */
     public function __construct($config,$view,$files,$assets){
         $this->config = $config;
         $this->view = $view;
@@ -35,13 +46,18 @@ class Environment {
     }
 
 
+    /**
+     * Load theme
+     * @param String $theme
+     * @return bool
+     */
     public function load($theme=null){
         #i: Get default theme if not set
         if(empty($theme)) {
             $theme = $this->config->get('core::app.theme.default');
         }
 
-        #i: Construct theme config file
+        #i: Construct theme config file path
         $theme_config_path = "{$this->themes_base_path}/$theme/config.php";
 
         #i: Check theme with config file exist, if not load default
@@ -88,6 +104,11 @@ class Environment {
     }
 
 
+    /**
+     * Register stylesheet into collection array
+     * @param array $assets_css
+     * @param String $theme
+     */
     public function registerStylesheet($assets_css=[],$theme=null){
         #i: Get default theme name if not supplied
         if(!isset($theme)) $theme =  $this->config->get('core::app.theme.default');
@@ -127,6 +148,11 @@ class Environment {
     }
 
 
+    /**
+     * Boot stylesheet into asset manager
+     * @param array $stylesheets
+     * @param string $group
+     */
     public function bootStylesheet($stylesheets=[],$group='common'){
         $this->assets->collection($group,function($collection) use($stylesheets){
             foreach($stylesheets as $stylesheet){
@@ -145,6 +171,11 @@ class Environment {
     }
 
 
+    /**
+     * Register javascript into collection array
+     * @param array $assets_js
+     * @param null $theme
+     */
     public function registerJavascript($assets_js=[],$theme=null){
         #i: Get default theme name if not supplied
         if(!isset($theme)) $theme =  $this->config->get('core::app.theme.default');
@@ -185,14 +216,22 @@ class Environment {
     }
 
 
+    /**
+     * Boot javascript into asset manager
+     * @param array $javascripts
+     * @param string $group
+     */
     public function bootJavascript($javascripts=[],$group='common'){
         $this->assets->collection($group,function($collection) use($javascripts){
             foreach($javascripts as $javascript){
+                #i: Get file extension
                 $file_extension = $this->files->extension($javascript);
 
                 if( $file_extension == 'js' ){
+                    #i: Add raw javascript
                     $collection->javascript($javascript)->raw();
                 }else{
+                    #i: Apply filtering based on file extension
                     $collection->javascript($javascript)->apply(studly_case($file_extension));
                 }
             }
@@ -200,6 +239,12 @@ class Environment {
     }
 
 
+    /**
+     * Detect and apply prefix to string value
+     * @param $value
+     * @param null $theme
+     * @return mixed
+     */
     public function applyPrefix($value,$theme=null){
         if(empty($theme)) $theme =  $this->config->get('core::app.theme.default');
 
@@ -207,7 +252,7 @@ class Environment {
         $prefixes = $this->theme_prefixes[$theme];
 
         #i: Find all prefix in value string
-        preg_match_all('/\w+[!]/',$value,$matches);
+        preg_match_all(self::PREFIX_PATTERN,$value,$matches);
 
         #i: Replace all matched with prefix value
         array_walk($matches[0], function($item) use($prefixes,&$value){
