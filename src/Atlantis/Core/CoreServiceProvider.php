@@ -48,8 +48,8 @@ class CoreServiceProvider extends ServiceProvider {
 	public function register()
 	{
         $this->registerDependencies();
+        $this->registerCoreServices();
         $this->registerServiceModule();
-        $this->registerServiceClient();
         $this->registerServiceTheme();
         $this->registerServiceHelpers();
         $this->registerConfigOverride();
@@ -93,6 +93,17 @@ class CoreServiceProvider extends ServiceProvider {
      *
      * @return void
      */
+    public function registerCoreServices(){
+        $this->app->register('Atlantis\Asset\ServiceProvider');
+        $this->app->register('Atlantis\Core\Client\ServiceProvider');
+    }
+
+
+    /**
+     *
+     *
+     * @return void
+     */
     public function registerServiceHelpers(){
         $this->app['atlantis.helpers'] = $this->app->share(function($app){
             return new Environment();
@@ -124,32 +135,6 @@ class CoreServiceProvider extends ServiceProvider {
         #i: Registering Module environment for facade
         $this->app['atlantis.theme'] = $this->app->share(function($app){
             return new Theme\Environment($app['config'],$app['view'],$app['files'],$app['basset']);
-        });
-    }
-
-
-    /**
-     *
-     *
-     * @return void
-     */
-    public function registerServiceClient(){
-        $this->app['atlantis.client.javascript'] = $this->app->share(function($app){
-            #i: Get configs
-            $view = $app['config']->get('core::client.javascript.bind');
-            $namespace = $app['config']->get('core::client.javascript.namespace');
-
-            #i: Get view binder
-            $binder = new View\Binder($app['events'],$view);
-
-            #i: Return provider instance
-            return new Javascript\Provider($binder,$namespace);
-        });
-
-        $this->app['atlantis.client'] = $this->app->share(function($app){
-            $javascript = $app['atlantis.client.javascript'];
-
-            return new Client\Environment($javascript);
         });
     }
 
@@ -238,7 +223,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('atlantis.helpers','atlantis.module','atlantis.client','atlantis.theme');
+		return array('atlantis.helpers','atlantis.module','atlantis.theme');
 	}
 
 }
