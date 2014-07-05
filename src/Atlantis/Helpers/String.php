@@ -5,6 +5,48 @@ use Illuminate\Support\Facades\Request;
 
 Class String {
 
+    const PREFIX_PATTERN = '/\w+[!]/';
+
+    public function applyPrefixes($values,$prefixes){
+
+        foreach($values as &$value){
+            if( is_array($value) ){
+                $value = $this->applyPrefixes($value,$prefixes);
+                continue;
+            }
+
+            #i: Find all prefix in value string
+            preg_match_all(self::PREFIX_PATTERN,$value,$matches);
+
+            #i: Replace all matched with prefix value
+            array_walk($matches[0], function($item) use($prefixes,&$value){
+                if( isset($prefixes[rtrim($item,'!')]) ) $value = str_replace($item,$prefixes[rtrim($item,'!')],$value);
+            });
+        }
+
+        return $values;
+    }
+
+
+    /**
+     * Will replace multiple occurrences with multiple target by pins supply, below is example pin:-
+     * $pins = array('a'=>'b,'x'='z')
+     *
+     * @param array $pins
+     * @param $subject
+     * @return mixed
+     */
+    public function str_replace_multiple(array $pins, $subject){
+        $needles = array_keys($pins);
+
+        foreach($needles as $needle){
+            $subject = str_replace($needle,$pins[$needle],$subject);
+        }
+
+        return $subject;
+    }
+
+
     public function url_base(){
         $url_full = Request::url();
         $url_path = Request::path();

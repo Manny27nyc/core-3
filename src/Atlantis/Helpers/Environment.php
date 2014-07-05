@@ -87,4 +87,13 @@ class Environment implements ArrayAccess{
 
         return null;
     }
+
+
+    public function __get($name){
+        if( $this->offsetExists($name) ){
+            return $this->offsetGet($name);
+        }
+
+        return null;
+    }
 }
