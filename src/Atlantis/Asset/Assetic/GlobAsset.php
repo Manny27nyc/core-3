@@ -2,7 +2,6 @@
 
 use Assetic\Asset\FileAsset;
 use Assetic\Util\VarUtils;
-use Assetic\Asset\AssetCollection;
 use Assetic\Filter\FilterInterface;
 
 

@@ -1,5 +1,6 @@
 <?php namespace Atlantis\Asset\Collection;
 
+use Atlantis\Asset\Assetic\AssetCollection;
 use Assetic\Filter\LessphpFilter;
 use Assetic\Filter\CssMinFilter;
 use Atlantis\Asset\Assetic\Filter\UriRewriteFilter;

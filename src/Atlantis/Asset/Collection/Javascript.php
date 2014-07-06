@@ -1,5 +1,6 @@
 <?php namespace Atlantis\Asset\Collection;
 
+use Atlantis\Asset\Assetic\AssetCollection;
 use Assetic\Filter\JSMinFilter;
 
 

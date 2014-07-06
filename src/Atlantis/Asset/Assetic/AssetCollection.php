@@ -1,4 +1,4 @@
-<?php namespace Atlantis\Asset\Collection;
+<?php namespace Atlantis\Asset\Assetic;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;
@@ -8,12 +8,7 @@ use Assetic\Asset\AssetCache;
 use Assetic\Asset\AssetCollection as BaseCollection;
 use Assetic\Asset\HttpAsset;
 use Assetic\Asset\FileAsset;
-use Assetic\AssetWriter;
-use Assetic\FilterManager;
-use Assetic\Cache\FilesystemCache;
 use Assetic\Factory\AssetFactory;
-use Assetic\Factory\LazyAssetManager;
-use Assetic\Factory\Worker\CacheBustingWorker;
 use Atlantis\Asset\Assetic\GlobAsset;
 
 
@@ -66,14 +61,31 @@ abstract class AssetCollection extends BaseCollection {
      */
     public function dump(FilterInterface $additionalFilter = null)
     {
-        // loop through leaves and dump each asset
-        $parts = array();
-        foreach ($this as $asset) {
-            $asset = $this->filterComposer($asset);
-            $parts[] = $asset->dump($additionalFilter);
-        }
+        #i: Construct cache name
+        $cache_name = app('atlantis.helpers')->string()->path_to_filename($this->base_path) . $this->mime;
 
-        return implode("\n", $parts);
+        #i: Cache enable/disable
+        if( !$this->config->get('core::asset.cached',true) ) app('cache')->forget($cache_name);
+
+        #i: Check for modified files
+        if( app('cache')->get($cache_name)['last_modified'] != $this->getLastModified() ) app('cache')->forget($cache_name);
+
+        #i: Get cache content if enabled
+        $output = app('cache')->rememberForever($cache_name, function() use($additionalFilter){
+            // loop through leaves and dump each asset
+            $parts = array();
+            foreach ($this as $asset) {
+                $asset = $this->filterComposer($asset);
+                $parts[] = $asset->dump($additionalFilter);
+            }
+
+            return [
+                'last_modified' => $this->getLastModified(),
+                'data'          => implode("\n", $parts)
+            ];
+        });
+
+        return $output['data'];
     }
 
 
