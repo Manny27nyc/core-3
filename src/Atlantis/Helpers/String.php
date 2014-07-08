@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Request;
 
 
 Class String {
-
     const PREFIX_PATTERN = '/\w+[!]/';
+
 
     public function applyPrefixes($values,$prefixes){
 
@@ -25,6 +25,40 @@ Class String {
         }
 
         return $values;
+    }
+
+
+    public function absolute_path($path,$real_path=false,$base_path=null) {
+        $base_path = $base_path ?: base_path();
+
+        #i: Already absolute if path starts with / or drive letter
+        if( !preg_match(',^([a-zA-Z]:|/),', $path) ){
+            $path = "$base_path/$path";
+        }
+
+        #i: Check for real path
+        if($real_path) return realpath($path);
+
+        #i: Return base path
+        return $path;
+    }
+
+
+    public function relative_path($relative,$full){
+        return str_finish(str_replace($relative,'',$full),'/');
+    }
+
+
+    public function path_to_filename($path,$extension=''){
+        if( !empty($extension)){
+            if( !starts_with($extension,'.') ) $extension = ".$extension";
+        }
+
+        $file_name = rtrim($path, basename($path));
+        $file_name = rtrim($file_name,'/');
+        $file_name = preg_replace('/[^a-zA-Z0-9]/', '-', $file_name) . $extension;
+
+        return $file_name;
     }
 
 
