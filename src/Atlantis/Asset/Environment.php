@@ -18,6 +18,7 @@ class Environment {
     protected $key;
     protected $processing;
 
+
     public function __construct($files,$config){
         #i: Vars
         $this->files = $files;
@@ -54,6 +55,12 @@ class Environment {
      * @return $this
      */
     public function get($key){
+        #i: Check for wildcard key
+        if( starts_with($key,['*::','::']) ){
+            $key = str_replace(['*::','::'],'',$key);
+        };
+
+        #i: Prepare the assets
         $this->processing = $this->assets->get($this->key = $key);
 
         #i: Immediate return on empty
@@ -114,12 +121,21 @@ class Environment {
 
         if( empty($this->processing) ) return null;
 
+        $mime = $this->processing->mime;
+
         #i: write file to disk
         $asset_files = $this->save($assets);
 
-        // create html and bind
+        #i: Create html
+        array_walk($asset_files, function(&$asset) use($mime){
+            if( $mime == 'javascript' ){
+                $asset = '<script href="'.$asset.'" type="text/'.$mime.'"></script>';
+            }else{
+                $asset = '<link href="'.$asset.'" rel="'.$mime.'" type="text/'.$mime.'" />';
+            }
+        });
 
-        return $asset_files;
+        echo implode("\n",$asset_files);
     }
 
 

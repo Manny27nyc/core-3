@@ -3,7 +3,7 @@
     'build_path'    => public_path() . '/builds/assets',
 
     'cache'         => [
-        'environment'   => ['local','production']
+        'environment'   => ['staging','production']
     ],
 
     'mimes'         => [
