@@ -134,7 +134,7 @@ class CoreServiceProvider extends ServiceProvider {
     public function registerServiceTheme(){
         #i: Registering Module environment for facade
         $this->app['atlantis.theme'] = $this->app->share(function($app){
-            return new Theme\Environment($app['config'],$app['view'],$app['files'],null);
+            return new Theme\Environment($app['config'],$app['view'],$app['files'],$app['atlantis.asset']);
         });
     }
 
