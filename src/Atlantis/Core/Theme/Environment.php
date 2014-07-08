@@ -1,8 +1,8 @@
 <?php namespace Atlantis\Core\Theme;
 
-use Assetic\Asset\AssetCollection;
-use Assetic\Asset\FileAsset;
-use Assetic\Asset\GlobAsset;
+use Illuminate\Support\Facades\App;
+use Atlantis\Asset\Collection\Stylesheet;
+use Atlantis\Asset\Collection\Javascript;
 
 
 class Environment {
@@ -83,159 +83,52 @@ class Environment {
         }
 
         #i: Load prefixes
-        if( isset($configs['register']['prefixes']) ) $this->theme_prefixes[$theme] = $configs['register']['prefixes'];
+        if( isset($configs['register']['prefixes']) ){
+            $this->theme_prefixes[$theme] = $configs['register']['prefixes'];
+            $configs['assets'] = $this->applyPrefixes($configs['assets'],$theme);
+        }
 
         #i: Load attributes
         if( isset($configs['register']['attributes']) ) $this->theme_attributes[$theme] = $configs['register']['attributes'];
 
-        #i: Register stylesheet to load
-        if( isset($configs['assets']['stylesheet']) ) $this->registerStylesheet($configs['assets']['stylesheet'],$theme);
+        #i: Registering current theme
+        app('atlantis.asset')->extend($theme,$configs['assets']);
 
-        #i: Register javascript to load
-        if( isset($configs['assets']['javascript']) ) $this->registerJavascript($configs['assets']['javascript'],$theme);
+        //$stylesheet = new Stylesheet($configs['assets']['stylesheet'],[],"{$this->themes_base_path}/$theme/assets");
+        //$javascript = new Javascript($configs['assets']['javascript'],[],"{$this->themes_base_path}/$theme/assets");
 
-        #i: Boot stylesheet with asset provider
-        $this->bootStylesheet($this->theme_stylesheets);
+        //app('atlantis.asset')->set('default::stylesheet',$stylesheet);
+        //app('atlantis.asset')->set('default::javascript',$javascript);
+        //dd(app('atlantis.asset')->get('default::stylesheet')->html());
 
-        #i: Boot javascript with asset provider
-        $this->bootJavascript($this->theme_javascripts);
+        //dd(app('atlantis.asset')->get("javascript")->html());
 
         return true;
     }
 
 
     /**
-     * Register stylesheet into collection array
-     * @param array $assets_css
-     * @param String $theme
+     * Apply theme prefixes
+     *
+     * @param           $collection
+     * @param string    $theme
+     * @return mixed
      */
-    public function registerStylesheet($assets_css=[],$theme=null){
+    public function applyPrefixes($collection,$theme=null){
         #i: Get default theme name if not supplied
         if(!isset($theme)) $theme =  $this->config->get('core::app.theme.default');
 
-        foreach($assets_css as $css){
-            #i: Check if value contain array
-            if( is_array($css) ){
-                $this->registerStylesheet($css,$theme);
+        foreach($collection as &$item){
+            if( is_array($item) ){
+                $item = $this->applyPrefixes($item);
                 continue;
             }
 
             #i: Apply prefix
-            $css = $this->applyPrefix($css,$theme);
-
-            if($this->files->isFile($css)){
-                #i: Add to stylesheet collection
-                $this->theme_stylesheets[] = $css;
-
-            }elseif($this->files->isDirectory($css)){
-                foreach( glob("$css/*.{css,less}",GLOB_BRACE) as $file_path ){
-                    $this->theme_stylesheets[] = $file_path;
-                }
-
-            }else{
-                #i: Guess if css path if it in components
-                $css_path = "{$this->themes_base_path}/$theme/assets/$css";
-
-                #i: If css file exist then add
-                if( $this->files->isFile($css_path) ){
-                    $this->theme_stylesheets[] = $css_path;
-
-                }elseif($this->files->isDirectory($css_path)){
-                    $this->registerStylesheet(glob("$css_path/*.{css,less}",GLOB_BRACE),$theme);
-                }
-            }
+            $item = $this->applyPrefix($item,$theme);
         }
-    }
 
-
-    /**
-     * Boot stylesheet into asset manager
-     * @param array $stylesheets
-     * @param string $group
-     */
-    public function bootStylesheet($stylesheets=[],$group='common'){
-        $this->assets->collection($group,function($collection) use($stylesheets){
-            foreach($stylesheets as $stylesheet){
-                $file_extension = $this->files->extension($stylesheet);
-
-                if( $file_extension == 'css' ){
-                    $collection->stylesheet($stylesheet);
-                }else{
-                    $collection->stylesheet($stylesheet)->apply(studly_case($file_extension));
-                }
-            }
-        })->apply('CssMin')
-            ->andApply('UriRewriteFilter')
-            ->andApply('UriPrependFilter')
-            ->setArguments($this->config->get('app.url'));
-    }
-
-
-    /**
-     * Register javascript into collection array
-     * @param array $assets_js
-     * @param null $theme
-     */
-    public function registerJavascript($assets_js=[],$theme=null){
-        #i: Get default theme name if not supplied
-        if(!isset($theme)) $theme =  $this->config->get('core::app.theme.default');
-
-        #i: Process all javascripts
-        foreach($assets_js as $js){
-            #i: Check if value contain array
-            if( is_array($js) ){
-                $this->registerJavascript($js,$theme);
-                continue;
-            }
-
-            #i: Apply prefix
-            $js = $this->applyPrefix($js,$theme);
-
-            if($this->files->isFile($js)){
-                #i: Add to stylesheet collection
-                $this->theme_javascripts[] = $js;
-
-            }elseif($this->files->isDirectory($js)){
-                foreach( glob("$js/*.{js}",GLOB_BRACE) as $file_path ){
-                    $this->theme_javascripts[] = $file_path;
-                }
-
-            }else{
-                #i: Guess if css path if it in components
-                $js_path = "{$this->themes_base_path}/$theme/assets/$js";
-
-                #i: If css file exist then add
-                if( $this->files->isFile($js_path) ){
-                    $this->theme_javascripts[] = $js_path;
-
-                }elseif($this->files->isDirectory($js_path)){
-                    $this->registerJavascript(glob("$js_path/*.{js}",GLOB_BRACE),$theme);
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Boot javascript into asset manager
-     * @param array $javascripts
-     * @param string $group
-     */
-    public function bootJavascript($javascripts=[],$group='common'){
-        $this->assets->collection($group,function($collection) use($javascripts){
-            foreach($javascripts as $javascript){
-                #i: Get file extension
-                $file_extension = $this->files->extension($javascript);
-
-                if( $file_extension == 'js' ){
-                    #i: Add raw javascript
-                    $collection->javascript($javascript)->raw();
-                }else{
-                    #i: Apply filtering based on file extension
-                    $collection->javascript($javascript)->apply(studly_case($file_extension));
-                }
-            }
-        })->apply('JsMin');
+        return $collection;
     }
 
 
@@ -260,5 +153,10 @@ class Environment {
         });
 
         return $value;
+    }
+
+
+    public function base_path(){
+        return $this->themes_base_path;
     }
 }

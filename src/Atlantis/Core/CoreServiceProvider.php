@@ -18,9 +18,10 @@
  * @link       http://nematix.com
  */
 
-use Atlantis\Helpers\String;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
+use Atlantis\Helpers\String;
+use Atlantis\Helpers\Arrays;
 use Atlantis\Core\Client\Javascript;
 use Atlantis\Core\Client;
 use Atlantis\Core\View;
@@ -52,7 +53,6 @@ class CoreServiceProvider extends ServiceProvider {
         $this->registerServiceModule();
         $this->registerServiceTheme();
         $this->registerServiceHelpers();
-        $this->registerConfigOverride();
         $this->registerCommands();
         $this->registerAlias();
 	}
@@ -83,7 +83,6 @@ class CoreServiceProvider extends ServiceProvider {
      */
     public function registerDependencies(){
         $this->app->register('Atlantis\Core\Config\ServiceProvider');
-        $this->app->register('Basset\BassetServiceProvider');
         $this->app->register('Former\FormerServiceProvider');
     }
 
@@ -110,6 +109,7 @@ class CoreServiceProvider extends ServiceProvider {
         });
 
         $this->app['atlantis.helpers']->extend('string', new String());
+        $this->app['atlantis.helpers']->extend('arrays', new Arrays());
     }
 
 
@@ -134,14 +134,10 @@ class CoreServiceProvider extends ServiceProvider {
     public function registerServiceTheme(){
         #i: Registering Module environment for facade
         $this->app['atlantis.theme'] = $this->app->share(function($app){
-            return new Theme\Environment($app['config'],$app['view'],$app['files'],$app['basset']);
+            return new Theme\Environment($app['config'],$app['view'],$app['files'],null);
         });
     }
 
-
-    public function registerConfigOverride(){
-        $this->app['config']->override('basset','config',__DIR__.'/../../config/basset');
-    }
 
     /**
      *
@@ -151,7 +147,6 @@ class CoreServiceProvider extends ServiceProvider {
     public function registerAlias(){
         $alias = AliasLoader::getInstance();
 
-        $alias->alias('Basset','Basset\Facade');
         $alias->alias('Former','Former\Facades\Former');
     }
 
