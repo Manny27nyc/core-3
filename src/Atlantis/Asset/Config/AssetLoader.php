@@ -108,13 +108,13 @@ class AssetLoader implements LoaderInterface{
             foreach($this->getNamespaces() as $namespace){
                 $current_assets = array_get($this->hints,"$namespace.$group");
                 $current_assets_path = array_get($this->hints,"$namespace.default.path");
+                if( is_null($current_assets) ) continue;
 
                 foreach($current_assets as &$asset){
                     $asset = app('atlantis.helpers')->string->absolute_path($asset,false,$current_assets_path);
                 }
 
                 $merge_assets = array_replace_recursive($merge_assets, $current_assets);
-
             }
 
             $exists = [
@@ -127,6 +127,8 @@ class AssetLoader implements LoaderInterface{
                 'default'   => array_get($this->hints,"$namespace.default"),
                 $group      => array_get($this->hints,"$namespace.$group")
             ];
+
+            if( !isset($this->hints[$namespace]) ) $exists = null;
         }
 
         if( is_null($exists) )return $this->assets[$exists] = false;
