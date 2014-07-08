@@ -28,11 +28,39 @@ class ServiceProvider extends BaseServiceProvider {
      * @return void
      */
     public function register(){
+        $this->registerBladeExtension();
+        $this->registerServiceAsset();
+    }
+
+
+    public function registerServiceAsset(){
         $this->app['atlantis.asset'] = $this->app->share(function($app){
             return new Environment($app['files'],$app['config']);
         });
     }
 
+    public function registerBladeExtension(){
+        $blade = $this->app['view']->getEngineResolver()->resolve('blade')->getCompiler();
+
+        $blade->extend(function($value, $compiler){
+            //$matcher = $compiler->createMatcher('javascripts');
+            $matcher = "/(?<!\\w)(\\s*)@javascripts(\\(\\')(\\s*.*)(\\'\\))/";
+
+            return preg_replace($matcher, '$1<?php echo app(\'atlantis.asset\')->get(\'$3::javascript\')->html(); ?>', $value);
+        });
+
+        $blade->extend(function($value, $compiler){
+            //$matcher = $compiler->createMatcher('stylesheets');
+            $matcher = "/(?<!\\w)(\\s*)@stylesheets(\\(\\')(\\s*.*)(\\'\\))/";
+
+            return preg_replace($matcher, '$1<?php echo app(\'atlantis.asset\')->get(\'$3::stylesheet\')->html(); ?>', $value);
+        });
+
+        $blade->extend(function($value, $compiler){
+            $matcher = $compiler->createMatcher('assets');
+            return preg_replace($matcher, '$1<?php echo app(\'atlantis.asset\')->get$2->html(); ?>', $value);
+        });
+    }
 
     /**
      * SP Provides
