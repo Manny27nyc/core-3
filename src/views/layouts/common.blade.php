@@ -11,7 +11,7 @@
     @section('stylesheet')
     <!-- StyleSheets
     ================================================== -->
-    @stylesheets('common','application')
+    @stylesheets('*')
     @show
 </head>
 <body>
@@ -38,7 +38,7 @@
 ================================================== -->
 @yield('_javascript')
 @section('javascript')
-    @javascripts('common')
+    @javascripts('*')
     <script>
         $(document).ready(function(){
             angular.element(document).ready(function() {
