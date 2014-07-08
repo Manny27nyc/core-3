@@ -8,13 +8,15 @@ use Assetic\Asset\AssetCache;
 use Assetic\Asset\AssetCollection as BaseCollection;
 use Assetic\Asset\HttpAsset;
 use Assetic\Asset\FileAsset;
-use Assetic\Factory\AssetFactory;
 use Atlantis\Asset\Assetic\GlobAsset;
 
 
 abstract class AssetCollection extends BaseCollection {
     protected $files;
     protected $config;
+    protected $content;
+    protected $environment;
+    protected $mimes;
 
     // Global vars
     public $base_path;
@@ -24,12 +26,14 @@ abstract class AssetCollection extends BaseCollection {
 
     public function __construct(array $assets=[], array $filters=[], $base_path=''){
         #i: Default vars
-        //$this->files = app('files');
+        $this->files = app('files');
         $this->config = app('config');
+        $this->environment = $env = app()->environment();
 
         #i: Default public vars
         $this->base_path = $base_path;
         $this->build_path = $this->config->get('core::asset.build_path');
+        $this->mimes = $this->config->get('core::asset.mimes');
         $this->mime = strtolower(class_basename($this));
 
         #i: Check for path asset in array
@@ -47,6 +51,19 @@ abstract class AssetCollection extends BaseCollection {
      */
     public function add(AssetInterface $asset)
     {
+        #i: Never add asset as GlobAsset
+        if( get_class($asset) == 'Atlantis\Asset\Assetic\GlobAsset' ){
+            foreach($asset->all() as $glob_asset){
+                $this->add($glob_asset);
+            };
+
+            return;
+        };
+
+        #i: Applying custom filter
+        $asset = $this->filterComposer($asset);
+
+        #i: Applying target path
         $asset = $this->applyTargetPath($asset);
 
         parent::add($asset);
@@ -57,35 +74,86 @@ abstract class AssetCollection extends BaseCollection {
      * Override dump asset function
      *
      * @param   FilterInterface     $additionalFilter
-     * @return  string
+     * @return  mixed
      */
     public function dump(FilterInterface $additionalFilter = null)
     {
         #i: Construct cache name
-        $cache_name = app('atlantis.helpers')->string()->path_to_filename($this->base_path) . $this->mime;
+        $cache_name = app('atlantis.helpers')->string()->path_to_filename($this->base_path) . "-{$this->mime}";
 
-        #i: Cache enable/disable
-        if( !$this->config->get('core::asset.cached',true) ) app('cache')->forget($cache_name);
+        if( in_array($this->environment, $this->config->get('core::asset.cache.environment')) ) {
+            #i: Rebuild asset collection with cache
+            $output = $this->getCache($cache_name,$additionalFilter);
 
+            return $output['data'];
+
+        }else{
+            #i: Clear previous cache
+            app('cache')->forget($cache_name);
+
+            #i: Build asset collection
+            return $this->build($additionalFilter,false);
+        }
+
+
+    }
+
+
+    public function getCache($cache_name, $additionalFilter=null){
         #i: Check for modified files
         if( app('cache')->get($cache_name)['last_modified'] != $this->getLastModified() ) app('cache')->forget($cache_name);
 
         #i: Get cache content if enabled
-        $output = app('cache')->rememberForever($cache_name, function() use($additionalFilter){
-            // loop through leaves and dump each asset
-            $parts = array();
-            foreach ($this as $asset) {
-                $asset = $this->filterComposer($asset);
-                $parts[] = $asset->dump($additionalFilter);
-            }
+        return app('cache')->rememberForever($cache_name, function() use($additionalFilter){
+            #i: Build if cache is new
+            $parts = $this->build($additionalFilter);
 
+            #i: Return concatenated content, always in cache
             return [
                 'last_modified' => $this->getLastModified(),
                 'data'          => implode("\n", $parts)
             ];
         });
+    }
 
-        return $output['data'];
+
+    /**
+     * Build & prepare collection
+     *
+     * @param null $additionalFilter
+     * @param bool $dump
+     * @return array
+     */
+    protected function build($additionalFilter=null, $dump=true){
+        $parts = array();
+
+        foreach ($this as $asset) {
+            #i: Target path
+            $asset = $this->applyTargetPath($asset);
+
+            #i: Dump content for return
+            if($dump) $asset = $asset->dump($additionalFilter);
+
+            $parts[] = $asset;
+        }
+
+        return $parts;
+    }
+
+    /**
+     * Check for array if path asset is passed
+     *
+     * @param   array   $assets
+     * @return  array
+     */
+    protected function processPathAssets($assets){
+        array_walk($assets, function(&$asset){
+            if( is_string($asset) ) {
+                $asset = $this->parseAsset($asset);
+            }
+        });
+
+        return $assets;
     }
 
 
@@ -93,18 +161,11 @@ abstract class AssetCollection extends BaseCollection {
      * Add asset by path
      *
      * @param   string    $asset_path
-     * @param   bool      $return_object
      * @return  mixed
      */
-    public function addByPath($asset_path, $return_object=false){
+    public function addByPath($asset_path){
         #i: Get asset container
         $asset = $this->parseAsset($asset_path);
-
-        #i: Add asset container to provider
-        if(!$asset) return null;
-
-        #i: Return object and don't add to collection
-        if($return_object) return $asset;
 
         #i: Add object to collection
         $this->add($asset);
@@ -123,46 +184,30 @@ abstract class AssetCollection extends BaseCollection {
 
 
     /**
-     * Check for array if path asset is passed
-     *
-     * @param   array   $assets
-     * @return  array
-     */
-    protected function processPathAssets(array $assets){
-        foreach($assets as &$asset){
-            if( is_string($asset) ) $asset = $this->addByPath($asset,true);
-        }
-
-        return $assets;
-    }
-
-
-    /**
      * Parse an asset path in object
      *
      * @param string    $asset_path
      * @return FileAsset|HttpAsset|GlobAsset|bool
      */
     protected function parseAsset($asset_path) {
+        $absolute_path = $this->getAbsolutePath($asset_path);
+
         #i:::: Check for HttpAsset
         if (starts_with($asset_path, 'http://')) {
             return new HttpAsset($asset_path);
 
         #i:::: Check for GlobAsset
         }else if (str_contains($asset_path, array('*', '?'))) {
-            return new GlobAsset($this->getAbsolutePath($asset_path));
+            return new GlobAsset($absolute_path);
 
         #i:::: Check for FileAsset
-        }else {
-            #i: Check for path
-            $file_asset_path = $this->getAbsolutePath($asset_path, true);
-
+        }else if( $this->getAbsolutePath($asset_path, true) ){
             #i: Return if path exist
-            if( $file_asset_path ) return new FileAsset($file_asset_path);
-        }
+            return new FileAsset($absolute_path);
 
-        #i: Return asset
-        return false;
+        }else{
+            return null;
+        }
     }
 
 
@@ -174,7 +219,12 @@ abstract class AssetCollection extends BaseCollection {
      */
     protected function applyTargetPath($asset){
         #i: Set target path and return container
-        $asset->setTargetPath($asset->getSourcePath());
+        $file_ext = $this->files->extension($asset->getSourcePath());
+        $default_ext = $this->mimes[$this->mime][0];
+
+        $source_path = str_replace($file_ext,$default_ext,$asset->getSourcePath());
+
+        $asset->setTargetPath($this->mime . '/' .$source_path);
 
         return $asset;
     }
@@ -183,7 +233,8 @@ abstract class AssetCollection extends BaseCollection {
     /**
      * Get absolute path
      *
-     * @param string    $path
+     * @param   string  $path
+     * @param  bool    $real_path
      * @return string
      */
     protected function getAbsolutePath($path,$real_path=false) {
@@ -198,48 +249,4 @@ abstract class AssetCollection extends BaseCollection {
         #i: Return base path
         return "$base_path/$path";
     }
-
-
-    /*    protected function assetAdd($asset_container){
-        #i: Check for GlobAsset if yes then iterate the glob result
-        if( get_class($asset_container) == 'Atlantis\Asset\Assetic\GlobAsset' ){
-            foreach( $asset_container->all() as $asset_glob ){
-                $this->assetAdd($asset_glob);
-            }
-            return true;
-        }
-
-        #i: Apply target path
-        $asset_container = $this->applyTargetPath($asset_container);
-
-        #i: Apply file filter
-        $asset_container = $this->applyFilters($asset_container, $this->getFilters());
-
-        #i: Add to AssetCollection
-        $this->provider()->add($asset_container);
-
-        return true;
-    }*/
-
-
-
-    /*protected function applyFilters($asset_container, $filters){
-        $mimes = $this->config->get('core::asset.mimes.stylesheet');
-        $filename = $asset_container->getTargetPath();
-
-        #i: Apply filter based on extension
-        foreach( $mimes as $filter ){
-            if( str_contains($filename,$filter) ){
-                $asset_container->setTargetPath( str_replace($filter, $mimes[0], $filename) );
-                $asset_container->ensureFilter($this->filters->get($filter));
-            }
-        }
-
-        #i: Apply filters
-        foreach($filters as $filter){
-            $asset_container->ensureFilter($this->filters->get($filter));
-        }
-
-        return $asset_container;
-    }*/
 }

@@ -5,7 +5,7 @@ use Assetic\Util\VarUtils;
 use Assetic\Filter\FilterInterface;
 
 
-class GlobAsset extends AssetCollection{
+class GlobAsset extends \Assetic\Asset\AssetCollection{
     private $globs;
     private $initialized;
 
