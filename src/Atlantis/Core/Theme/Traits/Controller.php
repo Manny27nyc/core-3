@@ -1,14 +1,12 @@
 <?php namespace Atlantis\Core\Theme\Traits;
 
-use Illuminate\Support\Facades\App;
-
 
 trait Controller {
 
     public function themeBoot($theme=null){
-        if(!$theme) $theme = App::make('config')->get('core::app.theme.current');
+        if(!$theme) $theme = app('config')->get('core::app.theme.current');
 
-        App::make('atlantis.theme')->load($theme);
+        app('atlantis.theme')->load($theme);
     }
 
 }
