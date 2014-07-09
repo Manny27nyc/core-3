@@ -5,15 +5,13 @@ use Illuminate\Config\LoaderInterface;
 
 
 class AssetLoader implements LoaderInterface{
-    // All type of assets will be store in AssetCollection and AssetCollection will be store in AssetManager
-    // Register receives array and process into AssetCollection, while Add receive AssetCollection
-
     protected $hints = [];
 
     protected $assets = [];
 
 
-    public function __construct(){
+    public function __construct()
+    {
         #i: Get common assets and prefixes
         $assets = app('config')->get('core::asset.assets');
         $mimes = app('config')->get('core::asset.mimes');
@@ -46,8 +44,6 @@ class AssetLoader implements LoaderInterface{
     public function load($environment, $group, $namespace = null)
     {
         #i: If no namespace provide set default
-        //$namespace = empty($namespace) ? 'common' : $namespace;
-
         $key = $this->getCollection($group,$namespace);
 
         #i: Check for existing value
@@ -55,14 +51,11 @@ class AssetLoader implements LoaderInterface{
             return $this->assets[$key];
         }
 
+        #i: Check and get assets existed in hints array
         $assets = $this->exists($group,$namespace);
 
         #i: If library not exist then return empty
         if( !$assets ) return [];
-
-        /*if( is_null($namespace) ){
-            $assets = [$group => $assets];
-        }*/
 
         #i: Get assets array
         $assets_common = $this->parseAssetsArray($assets,$group);
@@ -75,9 +68,11 @@ class AssetLoader implements LoaderInterface{
     }
 
 
-    protected function parseAssetsArray($assets,$group){
+    protected function parseAssetsArray($assets,$group)
+    {
         $assets_default = isset($assets['default']) ? $assets['default'] : app('config')->get('core::asset.assets.default');
 
+        #i: Construct mime class
         $asset_class = 'Atlantis\\Asset\\Collection\\'.studly_case($group);
         if( !class_exists($asset_class) ) return [];
 
@@ -108,13 +103,15 @@ class AssetLoader implements LoaderInterface{
             foreach($this->getNamespaces() as $namespace){
                 $current_assets = array_get($this->hints,"$namespace.$group");
                 $current_assets_path = array_get($this->hints,"$namespace.default.path");
+
+                #i: Skip if asset key not exist
                 if( is_null($current_assets) ) continue;
 
                 foreach($current_assets as &$asset){
                     $asset = app('atlantis.helpers')->string->absolute_path($asset,false,$current_assets_path);
                 }
 
-                $merge_assets = array_replace_recursive($merge_assets, $current_assets);
+                $merge_assets = array_merge_recursive($merge_assets, $current_assets);
             }
 
             $exists = [
@@ -131,7 +128,7 @@ class AssetLoader implements LoaderInterface{
             if( !isset($this->hints[$namespace]) ) $exists = null;
         }
 
-        if( is_null($exists) )return $this->assets[$exists] = false;
+        if( is_null($exists) )return $this->assets[$key] = false;
 
         return $exists;
     }
