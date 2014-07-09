@@ -222,13 +222,40 @@ abstract class AssetCollection extends BaseCollection {
         $file_ext = $this->files->extension($asset->getSourcePath());
         $default_ext = $this->mimes[$this->mime][0];
 
-        $source_path = str_replace($file_ext,$default_ext,$asset->getSourcePath());
+        #i: Construct filename with proper extension
+        $file_source_path = str_replace($file_ext,$default_ext,$asset->getSourcePath());
 
-        $asset->setTargetPath($this->mime . '/' .$source_path);
+        #i: Final file path structure
+        $asset->setTargetPath($this->mime . '/' .$file_source_path);
+
+        #i: Cache busting
+        $asset = $this->cacheBustingAsset($asset);
 
         return $asset;
     }
 
+
+    protected function cacheBustingAsset($asset){
+        $source_path = $asset->getTargetPath();
+
+        if( !$extension = pathinfo($source_path,PATHINFO_EXTENSION)){
+            return $asset;
+        }
+
+        #i: Getting hash value of file by last modified
+        $hash = hash_init('md5');
+        hash_update($hash,$asset->getLastModified());
+        $file_hash = hash_final($hash);
+
+        #i: Construct cached path from source path
+        $cached_path = "-$file_hash.$extension";
+        $source_path = preg_replace('/\.'.$extension.'$/',$cached_path,$source_path);
+
+        #i: Apply the cached path
+        $asset->setTargetPath($source_path);
+
+        return $asset;
+    }
 
     /**
      * Get absolute path
