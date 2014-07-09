@@ -33,16 +33,11 @@ class Environment {
 
 
     /**
-     * Register stylesheet into collection array
+     * Extend assets into collection array
      *
      * @param string    $namespace
      * @param array     $assets
      */
-    public function register($namespace,array $assets=[]){
-
-    }
-
-
     public function extend($namespace,array $assets=[]){
         $this->assets->getLoader()->addNamespace($namespace,$assets);
     }
@@ -129,9 +124,9 @@ class Environment {
         #i: Create html
         array_walk($asset_files, function(&$asset) use($mime){
             if( $mime == 'javascript' ){
-                $asset = '<script href="'.$asset.'" type="text/'.$mime.'"></script>';
+                $asset = '<script src="'.$asset.'"></script>';
             }else{
-                $asset = '<link href="'.$asset.'" rel="'.$mime.'" type="text/'.$mime.'" />';
+                $asset = '<link href="'.$asset.'" rel="'.$mime.'" type="text/css" />';
             }
         });
 
@@ -170,7 +165,13 @@ class Environment {
             $asset_files = [];
 
             foreach( $assets->dump() as $asset ){
+                #i: Create assets url collection
                 $asset_files[] = app('url')->asset($relative_path.$asset->getTargetPath());
+
+                #i: If file exist skip write
+                if( $this->files->exists($build_path.'/'.$asset->getTargetPath()) ) continue;
+
+                #i: Write to disk
                 $writer->writeAsset($asset);
             }
 
