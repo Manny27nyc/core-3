@@ -15,15 +15,14 @@
         "rhumsaa/uuid": "2.8.*@dev",
         "anahkiasen/former": "dev-master",
         "anahkiasen/underscore-php" : "dev-master",
+        "kriswallsmith/assetic": "1.*",
+        "oyejorge/less.php": "~1.5",
+        "mrclay/minify": "dev-master",
         "components/jquery": "*",
         "components/jqueryui": "dev-master",
         "components/angular.js": "dev-master",
         "components/bootstrap": "dev-master",
-        "components/font-awesome": "4.0.*@dev",
-        "kriswallsmith/assetic": "1.*",
-        "oyejorge/less.php": "~1.5",
-        "mrclay/minify": "dev-master",
-        "natxet/CssMin": "dev-master"
+        "components/font-awesome": "4.0.*@dev"
     },
     "autoload": {
         "classmap": [
