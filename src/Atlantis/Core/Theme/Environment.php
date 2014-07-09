@@ -1,8 +1,6 @@
 <?php namespace Atlantis\Core\Theme;
 
 use Illuminate\Support\Facades\App;
-use Atlantis\Asset\Collection\Stylesheet;
-use Atlantis\Asset\Collection\Javascript;
 
 
 class Environment {
@@ -91,17 +89,8 @@ class Environment {
         #i: Load attributes
         if( isset($configs['register']['attributes']) ) $this->theme_attributes[$theme] = $configs['register']['attributes'];
 
-        #i: Registering current theme
-        app('atlantis.asset')->extend($theme,$configs['assets']);
-
-        //$stylesheet = new Stylesheet($configs['assets']['stylesheet'],[],"{$this->themes_base_path}/$theme/assets");
-        //$javascript = new Javascript($configs['assets']['javascript'],[],"{$this->themes_base_path}/$theme/assets");
-
-        //app('atlantis.asset')->set('default::stylesheet',$stylesheet);
-        //app('atlantis.asset')->set('default::javascript',$javascript);
-        //dd(app('atlantis.asset')->get('default::stylesheet')->html());
-
-        //dd(app('atlantis.asset')->get("javascript")->html());
+        #i: Registering current theme assets
+        $this->assets->extend($theme,$configs['assets']);
 
         return true;
     }

@@ -27,11 +27,10 @@
         ),
 
         'stylesheet' => array(
-            'component!bootstrap/css/bootstrap.css',
-            'component!bootstrap/css/bootstrap-theme.css'
+            // May contain global stylesheets
         ),
         'javascript' => array(
-            'component!require.js',
+            // May contain global scripts
         )
     )
 
