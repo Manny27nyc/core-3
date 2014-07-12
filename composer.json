@@ -22,7 +22,8 @@
         "components/jqueryui": "dev-master",
         "components/angular.js": "dev-master",
         "components/bootstrap": "dev-master",
-        "components/font-awesome": "4.0.*@dev"
+        "components/font-awesome": "4.0.*@dev",
+        "components/typeahead.js": "dev-master"
     },
     "autoload": {
         "classmap": [
