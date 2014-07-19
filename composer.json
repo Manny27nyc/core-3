@@ -12,6 +12,7 @@
     "require": {
         "php": ">=5.4",
         "illuminate/support": "~4.2",
+        "dingo/api": "0.*",
         "rhumsaa/uuid": "2.8.*@dev",
         "anahkiasen/former": "dev-master",
         "anahkiasen/underscore-php" : "dev-master",

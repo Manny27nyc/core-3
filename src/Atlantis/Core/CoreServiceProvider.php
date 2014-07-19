@@ -53,6 +53,7 @@ class CoreServiceProvider extends ServiceProvider {
         $this->registerServiceModule();
         $this->registerServiceTheme();
         $this->registerServiceHelpers();
+        $this->registerConfigOverride();
         $this->registerCommands();
         $this->registerAlias();
 	}
@@ -83,6 +84,7 @@ class CoreServiceProvider extends ServiceProvider {
      */
     public function registerDependencies(){
         $this->app->register('Atlantis\Core\Config\ServiceProvider');
+        $this->app->register('Dingo\Api\ApiServiceProvider');
         $this->app->register('Former\FormerServiceProvider');
     }
 
@@ -148,6 +150,15 @@ class CoreServiceProvider extends ServiceProvider {
         $alias = AliasLoader::getInstance();
 
         $alias->alias('Former','Former\Facades\Former');
+    }
+
+
+    /*
+     *
+     * @return void
+     */
+    public function registerConfigOverride(){
+        $this->app['config']->override('dingo','config',__DIR__.'/../../config/dingo-api');
     }
 
 
