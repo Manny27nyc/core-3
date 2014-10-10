@@ -83,7 +83,6 @@ class CoreServiceProvider extends ServiceProvider {
      */
     public function registerDependencies(){
         $this->app->register('Atlantis\Core\Config\ServiceProvider');
-        $this->app->register('Dingo\Api\ApiServiceProvider');
         $this->app->register('Former\FormerServiceProvider');
     }
 

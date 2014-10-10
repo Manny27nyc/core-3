@@ -12,6 +12,7 @@ class ServiceProvider extends BaseProvider{
      */
     public function register(){
         $this->registerConfigOverride();
+        //$this->registerDependencies();
         $this->registerServiceRpc();
     }
 
@@ -33,6 +34,14 @@ class ServiceProvider extends BaseProvider{
      */
     public function registerConfigOverride(){
         $this->app['config']->override('api','config',__DIR__.'/../../config/dingo/api');
+    }
+
+
+    /**
+     *
+     */
+    public function registerDependencies(){
+        $this->app->register('Dingo\Api\ApiServiceProvider');
     }
 
 
