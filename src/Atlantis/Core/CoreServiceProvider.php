@@ -153,12 +153,13 @@ class CoreServiceProvider extends ServiceProvider {
 
 
     /**
-     *
+     * Registers all enabled module
      *
      * @return void
      */
     public function startLoadModules(){
-        $this->app['atlantis.module']->register();
+        //@info Register & load all module
+        $this->app['atlantis.module']->registers();
     }
 
 

@@ -96,7 +96,7 @@ class Environment {
      * @param $module_name
      * @return array
      */
-    public function getPath(){
+    public function getBasePath(){
         return base_path().'/modules';
     }
 
@@ -109,7 +109,7 @@ class Environment {
     public function available(){
         #i: Modules array & base path
         $modules = [];
-        $module_base = $this->app['config']->get('core::module.base',base_path().'/modules');
+        $module_base = $this->app['config']->get('core::module.base', $this->getBasePath());
 
         #i: Scanning folder for modules
         foreach( glob("$module_base/*",GLOB_ONLYDIR) as $dir ){
@@ -136,24 +136,40 @@ class Environment {
         return $modules;
     }
 
+    public function extend($name,$class_path){
+        $module = [
+            'enable'    => true,
+            'provider'  => $class_path
+        ];
+
+        if( $this->app->register($class_path) ){
+            $this->modules[$name] = array_merge_recursive($module, $this->app["modules.$name"]->info());
+        }
+    }
+
 
     /**
      * Register all enable module
      *
      * @return array
      */
-    public function register(){
+    public function registers(){
         foreach($this->all() as $name => $module){
-            #i: Register service provider
+            //@info Register service provider
             if( $module['enable'] ){
-                #i: Provider class path
-                $class_name = studly_case($name);
-                $class_path = "Modules\\$class_name\\".$module['provider'];
+                //@info Provider class path
+                if( starts_with($module['provider'], ['Modules\\']) ){
+                    $class_path = $module['provider'];
+                }else{
+                    //@info Sanitize dot for path $ class name
+                    $module_path = implode('\\', array_map('ucwords',explode('.',$name)));
+                    $class_path = "Modules\\$module_path\\".$module['provider'];
+                }
 
-                #i: Registering class
+                //@info Registering class
                 $this->app->register($class_path);
 
-                #i: Merging info from class
+                //@info Merging info from class
                 $this->modules[$name] = array_merge_recursive($module,$this->app["modules.$name"]->info());
             };
         }
