@@ -18,10 +18,10 @@
         "kriswallsmith/assetic": "1.*",
         "oyejorge/less.php": "~1.5",
         "mrclay/minify": "dev-master",
-        "dingo/api": "0.*",
+        "dingo/api": "0.6.*@dev",
         "components/jquery": "*",
         "components/jqueryui": "dev-master",
-        "components/angular.js": "dev-master",
+        "components/angular.js": "1.3.0-beta.14",
         "components/bootstrap": "dev-master",
         "components/font-awesome": "4.0.*@dev",
         "components/underscore": "dev-master"
