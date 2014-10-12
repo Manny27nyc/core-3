@@ -71,7 +71,7 @@ class ModuleCommandController extends Command {
      */
     protected function getControllerPath()
     {
-        return basename($this->module->getPath()) . "/$this->moduleName/controllers";
+        return basename($this->module->getBasePath()) . "/$this->moduleName/controllers";
     }
 
     /**

@@ -121,7 +121,7 @@ class ModuleCommandMake extends Command {
      */
     protected function getModulePath($name = null)
     {
-        $path = $this->module->getPath();
+        $path = $this->module->getBasePath();
         if($name)
         {
             return $path . "/$name/";

@@ -77,7 +77,7 @@ class ModuleCommandSeedMake extends Command {
      */
     protected function getDestinationFile($file)
     {
-        return $this->getPath() . $this->formatContent($file);
+        return $this->getBasePath() . $this->formatContent($file);
     }
 
     /**
@@ -119,7 +119,7 @@ class ModuleCommandSeedMake extends Command {
      */
     protected function getPath()
     {
-        $path = $this->module->getPath();
+        $path = $this->module->getBasePath();
         return $path . "/$this->moduleName/database/seeds/";
     }
 
