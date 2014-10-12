@@ -1,15 +1,11 @@
-<?php namespace Atlantis\API;
+<?php namespace Atlantis\Api;
 
-class Environment {
+use Atlantis\Core\Module\Environment as BaseEnvironment;
 
-    public function __construct()
+class Environment extends BaseEnvironment{
+
+    public function __construct($app)
     {
-
     }
 
-
-    public function get($name)
-    {
-        return app('dingo.api.dispatcher')->get($name);
-    }
 } 

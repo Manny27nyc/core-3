@@ -17,18 +17,8 @@
  * @copyright  (c) 1997 - 2014, Nematix Corporation
  * @link       http://nematix.com
  */
+namespace Atlantis\Api\Exception;
 
-namespace Atlantis\Api\Rpc\Exceptions;
-
-use Atlantis\Support\Exceptions\Provider;
-
-class InternalErrorException extends Provider{
-    protected $message = 'Internal error';
-    protected $code = -32603;
-    protected $data;
-
-    public function __construct($data = null)
-    {
-        parent::__construct($data, $this->code);
-    }
-} 
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+{
+}

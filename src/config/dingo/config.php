@@ -146,7 +146,7 @@ return [
 
     'formats' => [
 
-        'json' => new Atlantis\Api\Http\ResponseFormat\Json
+        'json' => new Atlantis\Api\Serializer\Json
 
     ]
 

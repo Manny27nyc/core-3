@@ -17,16 +17,14 @@
  * @copyright  (c) 1997 - 2014, Nematix Corporation
  * @link       http://nematix.com
  */
+namespace Atlantis\Api\Exception;
 
-namespace Atlantis\Api\Rpc\Interfaces;
-
-
-interface RequestValidatorInterface {
-
-    public function validate(array $request);
-    public function isValidRequest(array $request);
-    public function hasValidVersion(array $request);
-    public function hasValidMethodFormat(array $request);
-    public function hasValidParameters(array $request);
-
-} 
+/**
+ * Interface for exceptions that can provide additional API Problem details
+ */
+interface ProblemExceptionInterface
+{
+    public function getAdditionalDetails();
+    public function getDescribedBy();
+    public function getTitle();
+}

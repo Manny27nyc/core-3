@@ -1,25 +1,12 @@
-<?php namespace Atlantis\Api\Http\ResponseFormat;
+<?php
 
-use Atlantis\Api\Rpc\Interfaces\ConfigInterface;
-use Atlantis\Api\Rpc\Interfaces\ResponseBuilderInterface;
-use Dingo\Api\Http\ResponseFormat\ResponseFormat as BaseResponseFormat;
+namespace Atlantis\Api\Serializer;
 
+use Illuminate\Support\Contracts\ArrayableInterface;
+use Dingo\Api\Http\ResponseFormat\ResponseFormat;
 
-class JsonRpc extends BaseResponseFormat {
-    const SUCCESS_PROPERTY = 'result';
-    const ERROR_PROPERTY = 'error';
-
-    public $id;
-    public $jsonrpc = '2.0';
-
-
-    public function __construct(ConfigInterface $config, ResponseBuilderInterface $response_builder)
-    {
-        $this->config = $config;
-        $this->response_builder = $response_builder;
-    }
-
-
+class Json extends ResponseFormat
+{
     /**
      * Format an Eloquent model.
      *
@@ -48,18 +35,16 @@ class JsonRpc extends BaseResponseFormat {
         return $this->encode($collection->toArray());
     }
 
-
     /**
      * Format other response type such as a string or integer.
      *
-     * @param  string  $content
+     * @param  string  $string
      * @return string
      */
     public function formatOther($content)
     {
         return $content;
     }
-
 
     /**
      * Format an array or instance implementing ArrayableInterface.
@@ -78,7 +63,6 @@ class JsonRpc extends BaseResponseFormat {
         return $this->encode($content);
     }
 
-
     /**
      * Get the response content type.
      *
@@ -89,4 +73,25 @@ class JsonRpc extends BaseResponseFormat {
         return 'application/json';
     }
 
+    /**
+     * Morph a value to an array.
+     *
+     * @param  array|\Illuminate\Support\Contracts\ArrayableInterface  $value
+     * @return array
+     */
+    protected function morphToArray($value)
+    {
+        return $value instanceof ArrayableInterface ? $value->toArray() : $value;
+    }
+
+    /**
+     * Encode the content to its JSON representation.
+     *
+     * @param  string  $content
+     * @return string
+     */
+    protected function encode($content)
+    {
+        return json_encode($content);
+    }
 }

@@ -17,13 +17,8 @@
  * @copyright  (c) 1997 - 2014, Nematix Corporation
  * @link       http://nematix.com
  */
+namespace Atlantis\Api\Exception;
 
-namespace Atlantis\Api\Rpc\Interfaces;
-
-
-interface ResponseBuilderInterface {
-
-    public function buildFromResult($request, $result);
-    public function buildFromException($request, \Exception $exception);
-
-} 
+interface ExceptionInterface
+{
+}

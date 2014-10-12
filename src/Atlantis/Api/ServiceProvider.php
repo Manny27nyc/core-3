@@ -1,4 +1,4 @@
-<?php namespace Atlantis\API;
+<?php namespace Atlantis\Api;
 
 use Illuminate\Support\ServiceProvider as BaseProvider;
 
@@ -12,8 +12,7 @@ class ServiceProvider extends BaseProvider{
      */
     public function register(){
         $this->registerConfigOverride();
-        //$this->registerDependencies();
-        $this->registerServiceRpc();
+        $this->registerDependencies();
     }
 
 
@@ -23,8 +22,6 @@ class ServiceProvider extends BaseProvider{
      */
     public function boot(){
         $this->package('atlantis/api');
-
-        $this->bootServiceRpc();
     }
 
 
@@ -33,7 +30,7 @@ class ServiceProvider extends BaseProvider{
      * @return void
      */
     public function registerConfigOverride(){
-        $this->app['config']->override('api','config',__DIR__.'/../../config/dingo/api');
+        $this->app['config']->override('api','config',__DIR__.'/../../config/dingo');
     }
 
 
@@ -46,45 +43,10 @@ class ServiceProvider extends BaseProvider{
 
 
     /**
-     *
-     * @return void
-     */
-    public function registerServiceRpc(){
-        $this->app->bind('Atlantis\Api\Rpc\Interfaces\ConfigInterface','Atlantis\Api\Rpc\Config');
-        $this->app->bind('Atlantis\Api\Rpc\Interfaces\RouteInterface','Atlantis\Api\Rpc\Route');
-    }
-
-
-    /**
-     *
-     * @return void
-     */
-    public function bootServiceRpc(){
-        $config = $this->app->make('Atlantis\Api\Rpc\Interfaces\ConfigInterface');
-        $route_prefix = $config->getRoutePrefix();
-
-        if (empty($rpc_prefix)) {
-            $this->app->before(function(){
-                $this->app['router']->post('{all}', function(){
-                    $this->app->make('Atlantis\Api\Rpc\Interfaces\RouteInterface')->route();
-                })->where('all','*');
-            });
-
-        } else {
-            $this->app->before(function() use($route_prefix){
-                $this->app['router']->post($route_prefix, function(){
-                    $this->app->make('Atlantis\Api\Rpc\Interfaces\RouteInterface')->route();
-                });
-            });
-        }
-    }
-
-
-    /**
      * @return array
      */
     public function provides()
     {
-        return [];
+        return ['atlantis.api'];
     }
 } 
