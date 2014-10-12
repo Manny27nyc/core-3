@@ -28,6 +28,11 @@ Class String {
     }
 
 
+    public function nameClassPath($value){
+        return implode('\\', array_map('ucwords',explode('.',$value)));
+    }
+
+
     public function absolute_path($path,$real_path=false,$base_path=null) {
         $base_path = $base_path ?: base_path();
 
