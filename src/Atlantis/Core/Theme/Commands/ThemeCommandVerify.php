@@ -55,6 +55,13 @@ class ThemeCommandVerify extends Command {
         foreach($this->folders as $folder => $foreman){
             $check_path = base_path() . '/' . $folder;
 
+            //@info Force components diagnose
+            if($this->option('force-components')){
+                $this->diagnoseComponents();
+                unset($this->folders['public/components/']);
+                return;
+            }
+
             if( !$this->file->exists($check_path) ){
                 $this->error("PROBLEM! Folder $folder not exist, starting diagnostic tool..");
                 if( method_exists($this, $foreman) ) $this->{$foreman}();
@@ -73,7 +80,7 @@ class ThemeCommandVerify extends Command {
     }
 
     protected function diagnoseComponents(){
-        $folders = ['components','vendor/atlantis/core/public/components'];
+        $folders = ['components','vendor/atlantis/core/public/components','workbench/atlantis/core/public/components'];
         $this->info('Diagnosing components folder..');
 
         foreach($folders as $folder){
@@ -104,13 +111,17 @@ class ThemeCommandVerify extends Command {
             if( !$this->confirm("Copy contents from $title_source to $title_destination ?[yes|no]") ) return;;
         }
 
-        return $this->file->copyDirectory($source,$destination);
+        $this->file->copyDirectory($source,$destination);
+        $this->info('File content copy completed!');
+
+        return true;
     }
 
 
     protected function getOptions(){
         return array(
-            array('auto',null,InputOption::VALUE_OPTIONAL,'Do not prompt on action, system will decide. eg: "--auto=true"', null)
+            array('auto',null,InputOption::VALUE_OPTIONAL,'Do not prompt on action, system will decide. eg: "--auto=true"', null),
+            array('force-components',null,InputOption::VALUE_OPTIONAL,'Force copy on components inspection. eg: "--force-components=true"', null)
         );
     }
 
