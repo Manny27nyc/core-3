@@ -40,7 +40,7 @@
     "minimum-stability": "dev",
     "config": {
         "preferred-install": "dist",
-        "component-dir": "../../../public/components",
+        "component-dir": "public/components",
         "component-baseurl": "/components"
     }
 }

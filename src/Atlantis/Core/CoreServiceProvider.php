@@ -203,12 +203,17 @@ class CoreServiceProvider extends ServiceProvider {
             return new Module\Commands\ModuleCommandMake($app['atlantis.module'],$app['files']);
         });
 
+        $this->app['atlantis.commands.theme-verify'] = $this->app->share(function($app){
+            return new Theme\Commands\ThemeCommandVerify($app['files']);
+        });
+
         $this->commands(
             'atlantis.commands.module-migrate',
             'atlantis.commands.module-seed',
             'atlantis.commands.module-seed-make',
             'atlantis.commands.module-controller',
-            'atlantis.commands.module-make'
+            'atlantis.commands.module-make',
+            'atlantis.commands.theme-verify'
         );
     }
 
