@@ -14,7 +14,7 @@
         "illuminate/support": ">=4.2",
         "rhumsaa/uuid": "2.7.*@dev",
         "anahkiasen/former": "*",
-        "anahkiasen/underscore-php" : "dev-master",
+        "anahkiasen/underscore-php" : "*",
         "kriswallsmith/assetic": "1.*",
         "oyejorge/less.php": "~1.5",
         "mrclay/minify": "dev-master",
