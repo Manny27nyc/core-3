@@ -47,10 +47,10 @@
     |
     */
     'modules' => [
-        'advance' => [
+        /*'advance' => [
             'enable' => true,
             'provider' => 'AdvanceServiceProvider'
-        ]
+        ]*/
     ]
 
 ];
