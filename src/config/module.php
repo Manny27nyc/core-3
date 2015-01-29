@@ -48,8 +48,8 @@
     */
     'modules' => [
         /*'advance' => [
-            'enable' => true,
-            'provider' => 'AdvanceServiceProvider'
+            'enable' => false,
+            'provider' => 'FooServiceProvider'
         ]*/
     ]
 
