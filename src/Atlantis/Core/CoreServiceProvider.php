@@ -77,7 +77,7 @@ class CoreServiceProvider extends ServiceProvider {
 
 
     /**
-     *
+     * Registering main dependencies
      *
      * @return void
      */
@@ -88,7 +88,7 @@ class CoreServiceProvider extends ServiceProvider {
 
 
     /**
-     *
+     * Registering Core Services
      *
      * @return void
      */
@@ -100,7 +100,7 @@ class CoreServiceProvider extends ServiceProvider {
 
 
     /**
-     *
+     * Registering Helpers
      *
      * @return void
      */
@@ -109,6 +109,7 @@ class CoreServiceProvider extends ServiceProvider {
             return new Environment();
         });
 
+        #i Default helpers
         $this->app['atlantis.helpers']->extend('string', new String());
         $this->app['atlantis.helpers']->extend('arrays', new Arrays());
     }
