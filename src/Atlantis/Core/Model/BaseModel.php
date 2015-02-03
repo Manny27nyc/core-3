@@ -24,9 +24,9 @@ class BaseModel extends Eloquent {
             $value_original = parent::getAttribute($key);
         }
 
-        #i: Context Reaction
+        #i: Context Reaction, AttributeSet
         if( class_exists('\\Atlantis\\Context\\ContextServiceProvider') ){
-            $context_value = $this->getContextReaction($key);
+            $context_value = $this->getContextReaction($key,$value_original);
             if( $context_value ) $value_original = $context_value;
         }
 
@@ -40,19 +40,22 @@ class BaseModel extends Eloquent {
      * @param $key
      * @return null
      */
-    protected function getContextReaction($key){
+    protected function getContextReaction($key,$value){
         #i: Get context
-        $contexts = app('context');
+        $contexts = app('context')->all();
 
         #i: Check if Reaction Contexts exist for this model
-        $context = Arrays::find($contexts->all(), function($value){
+        $context = Arrays::find($contexts, function($value){
+            if( $value->status == 0 ) return false;
+
             return $value->reaction_parameters->model == get_called_class();
         });
+
 
         #i: Inspect reaction context for this model
         if($context){
             #i: Inspect context
-            $value = $contexts->reactionInspect($context->reaction_provider,[$this,$key,$context->reaction_parameters]);
+            $value = app('context')->reactionInspect($context->reaction_provider,[$this,$key,$value,$context->reaction_parameters]);
 
             #i: Override value
             if($value) return $value;
