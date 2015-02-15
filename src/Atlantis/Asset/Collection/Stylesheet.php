@@ -17,12 +17,19 @@ class Stylesheet extends AssetCollection{
     }
 
 
+    /**
+     * Additional stylesheet processing
+     *
+     * @param \Assetic\Asset\AssetInterface $asset
+     * @return \Assetic\Asset\AssetInterface
+     */
     protected function filterComposer($asset){
+        $base_url = app('config')->get('app.url');
         $file_ext = $this->files->extension($asset->getSourcePath());
 
         #i: Uri filter
         $asset->ensureFilter(new UriRewriteFilter());
-        $asset->ensureFilter(new UriPrependFilter('/ependahuluan'));
+        $asset->ensureFilter(new UriPrependFilter($base_url));
 
         #i: Apply filter based on extension
         if( $file_ext == 'less' ){
