@@ -4,8 +4,6 @@ use Illuminate\Config\Repository;
 use Illuminate\Http\Response;
 use Atlantis\Asset\Config\AssetLoader;
 use Assetic\AssetWriter;
-use Assetic\Asset\AssetCache;
-use Assetic\Factory\AssetFactory;
 
 
 class Environment {
@@ -26,7 +24,7 @@ class Environment {
         $this->helpers = app('atlantis.helpers');
         $this->environment = $env = app()->environment();
 
-        #i: Asset loader
+        #i: Atlantis Asset loader
         $loader = new AssetLoader();
         $this->assets = new Repository($loader, app('env'));
     }
@@ -39,12 +37,15 @@ class Environment {
      * @param array     $assets
      */
     public function extend($namespace,array $assets=[]){
+        // If existing namespace given, the previous assets on namespace will be override.
+        // Namespace with name of `foo` can be called `app('atlantis.asset')->get('foo')->html()`
+        // or `app('atlantis.asset')->get('foo::javascript')->html()` instead for javascript only
         $this->assets->getLoader()->addNamespace($namespace,$assets);
     }
 
 
     /**
-     * Getting repo value
+     * Compiled and return assets list
      *
      * @param $key
      * @return $this
@@ -105,7 +106,7 @@ class Environment {
 
 
     /**
-     * Static assets
+     * Static assets in HTML
      *
      * @param array $assets
      * @return array

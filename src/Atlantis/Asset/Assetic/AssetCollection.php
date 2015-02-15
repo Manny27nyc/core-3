@@ -18,7 +18,6 @@ abstract class AssetCollection extends BaseCollection {
     protected $environment;
     protected $mimes;
 
-    // Global vars
     public $base_path;
     public $build_path;
     public $mime;
@@ -99,6 +98,13 @@ abstract class AssetCollection extends BaseCollection {
     }
 
 
+    /**
+     * Get asset cache
+     *
+     * @param $cache_name
+     * @param null $additionalFilter
+     * @return mixed
+     */
     public function getCache($cache_name, $additionalFilter=null){
         #i: Check for modified files
         if( app('cache')->get($cache_name)['last_modified'] != $this->getLastModified() ) app('cache')->forget($cache_name);
@@ -235,10 +241,17 @@ abstract class AssetCollection extends BaseCollection {
     }
 
 
+    /**
+     * Cache busting
+     *
+     * @param $asset
+     * @return mixed
+     */
     protected function cacheBustingAsset($asset){
         $source_path = $asset->getTargetPath();
 
-        if( !$extension = pathinfo($source_path,PATHINFO_EXTENSION)){
+        #i: Get file extension, if none then return
+        if( !$extension = pathinfo($source_path,PATHINFO_EXTENSION) ){
             return $asset;
         }
 
@@ -251,7 +264,7 @@ abstract class AssetCollection extends BaseCollection {
         $cached_path = "-$file_hash.$extension";
         $source_path = preg_replace('/\.'.$extension.'$/',$cached_path,$source_path);
 
-        #i: Apply the cached path
+        #i: Apply the cached path to string
         $asset->setTargetPath($source_path);
 
         return $asset;

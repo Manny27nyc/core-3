@@ -5,8 +5,10 @@ use Illuminate\Config\LoaderInterface;
 
 
 class AssetLoader implements LoaderInterface{
+    /** @var array Assets collection hints */
     protected $hints = [];
 
+    /** @var array Assets collection */
     protected $assets = [];
 
 
@@ -23,9 +25,8 @@ class AssetLoader implements LoaderInterface{
         #i: Apply prefixes
         $assets = app('atlantis.helpers')->string()->applyPrefixes($assets,$prefixes);
 
-        #i: Get common asset types
+        #i: Get and construct common asset types
         $asset_types = array_keys($mimes);
-
         foreach( $asset_types as $asset_type){
             #i: Create an AssetCollection of current asset
             if( isset($assets[$asset_type]) ) $this->addNamespace('common',$assets);
@@ -68,11 +69,19 @@ class AssetLoader implements LoaderInterface{
     }
 
 
+    /**
+     * Parse assets from array
+     *
+     * @param $assets
+     * @param $group
+     * @return array
+     */
     protected function parseAssetsArray($assets,$group)
     {
+        #i: Get default asset config
         $assets_default = isset($assets['default']) ? $assets['default'] : app('config')->get('core::asset.assets.default');
 
-        #i: Construct mime class
+        #i: Construct mime class base collection class
         $asset_class = 'Atlantis\\Asset\\Collection\\'.studly_case($group);
         if( !class_exists($asset_class) ) return [];
 
@@ -171,6 +180,13 @@ class AssetLoader implements LoaderInterface{
     }
 
 
+    /**
+     * Get collection key
+     *
+     * @param $group
+     * @param null $namespace
+     * @return string
+     */
     protected function getCollection($group, $namespace=null){
         $namespace = $namespace ?: '*';
         return $group.'::'.$namespace;

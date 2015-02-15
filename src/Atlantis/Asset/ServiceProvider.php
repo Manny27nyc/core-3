@@ -33,24 +33,29 @@ class ServiceProvider extends BaseServiceProvider {
     }
 
 
+    /**
+     * Registering Service Asset
+     */
     public function registerServiceAsset(){
         $this->app['atlantis.asset'] = $this->app->share(function($app){
             return new Environment($app['files'],$app['config']);
         });
     }
 
+    /**
+     * Registering Blade Extension
+     * @return void
+     */
     public function registerBladeExtension(){
         $blade = $this->app['view']->getEngineResolver()->resolve('blade')->getCompiler();
 
         $blade->extend(function($value, $compiler){
-            //$matcher = $compiler->createMatcher('javascripts');
             $matcher = "/(?<!\\w)(\\s*)@javascripts(\\(\\')(\\s*.*)(\\'\\))/";
 
             return preg_replace($matcher, '$1<?php echo app(\'atlantis.asset\')->get(\'$3::javascript\')->html(); ?>', $value);
         });
 
         $blade->extend(function($value, $compiler){
-            //$matcher = $compiler->createMatcher('stylesheets');
             $matcher = "/(?<!\\w)(\\s*)@stylesheets(\\(\\')(\\s*.*)(\\'\\))/";
 
             return preg_replace($matcher, '$1<?php echo app(\'atlantis.asset\')->get(\'$3::stylesheet\')->html(); ?>', $value);
