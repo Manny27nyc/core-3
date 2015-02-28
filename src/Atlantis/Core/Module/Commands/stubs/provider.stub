@@ -1,6 +1,6 @@
-<?php namespace Modules;
+<?php namespace Modules\{{Name}};
 
-use Atlantis\Core\Module\ServiceProvider;
+use Atlantis\Core\Module\ServiceProviderFactory as ServiceProvider;
 
 
 class {{Name}}ServiceProvider extends ServiceProvider {
