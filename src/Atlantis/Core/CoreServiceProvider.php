@@ -20,8 +20,6 @@
 
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
-use Atlantis\Helpers\String;
-use Atlantis\Helpers\Arrays;
 use Atlantis\Core\Client\Javascript;
 use Atlantis\Core\Client;
 use Atlantis\Core\View;
@@ -29,6 +27,9 @@ use Atlantis\Core\Config;
 use Atlantis\Core\Module;
 use Atlantis\Core\Theme;
 use Atlantis\Helpers\Environment;
+use Atlantis\Helpers\String;
+use Atlantis\Helpers\Arrays;
+use Atlantis\Helpers\Debug;
 
 
 class CoreServiceProvider extends ServiceProvider {
@@ -112,6 +113,7 @@ class CoreServiceProvider extends ServiceProvider {
         #i Default helpers
         $this->app['atlantis.helpers']->extend('string', new String());
         $this->app['atlantis.helpers']->extend('arrays', new Arrays());
+        $this->app['atlantis.helpers']->extend('debug', new Debug());
     }
 
 
