@@ -14,7 +14,7 @@
         "illuminate/support": "~4.2.0",
         "firephp/firephp-core": "dev-master",
         "rhumsaa/uuid": "2.7.*@dev",
-        "anahkiasen/former": "*",
+        "anahkiasen/former": "3.5.4",
         "anahkiasen/underscore-php" : "*",
         "kriswallsmith/assetic": "1.*",
         "oyejorge/less.php": "~1.5",
