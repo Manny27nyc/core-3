@@ -1,4 +1,6 @@
-<?php namespace Atlantis\Asset;
+<?php
+
+namespace Atlantis\Asset;
 /**
  * Part of the Atlantis package.
  *
@@ -25,6 +27,7 @@ class ServiceProvider extends BaseServiceProvider {
 
     /**
      * Registering Service Provider
+     *
      * @return void
      */
     public function register(){
@@ -35,6 +38,7 @@ class ServiceProvider extends BaseServiceProvider {
 
     /**
      * Registering Service Asset
+     *
      */
     public function registerServiceAsset(){
         $this->app['atlantis.asset'] = $this->app->share(function($app){
@@ -44,6 +48,7 @@ class ServiceProvider extends BaseServiceProvider {
 
     /**
      * Registering Blade Extension
+     *
      * @return void
      */
     public function registerBladeExtension(){
@@ -69,6 +74,7 @@ class ServiceProvider extends BaseServiceProvider {
 
     /**
      * SP Provides
+     *
      * @return array
      */
     public function provides(){

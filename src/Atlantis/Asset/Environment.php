@@ -1,4 +1,6 @@
-<?php namespace Atlantis\Asset;
+<?php
+
+namespace Atlantis\Asset;
 
 use Illuminate\Config\Repository;
 use Illuminate\Http\Response;
@@ -7,24 +9,42 @@ use Assetic\AssetWriter;
 
 
 class Environment {
+    /** @var $files Array Files collection */
     protected $files;
+
+    /** @var $config mixed Config object */
     protected $config;
+
+    /** @var $helpers \Atlantis\Helpers\Facades\Helpers Helpers instance */
     protected $helpers;
+
+    /** @var $assets \Illuminate\Config\Repository Repository instance */
     protected $assets;
 
+    /** @var $environment mixed Environment instance */
     protected $environment;
+
+    /** @var $key String Current asset key */
     protected $key;
+
+    /** @var $processing \Illuminate\Config\Repository Current asset repository */
     protected $processing;
 
 
+    /**
+     * Constructor
+     *
+     * @param $files
+     * @param $config
+     */
     public function __construct($files,$config){
-        #i: Vars
+        /** Vars */
         $this->files = $files;
         $this->config = $config;
         $this->helpers = app('atlantis.helpers');
         $this->environment = $env = app()->environment();
 
-        #i: Atlantis Asset loader
+        /** Atlantis Asset loader */
         $loader = new AssetLoader();
         $this->assets = new Repository($loader, app('env'));
     }
@@ -51,24 +71,25 @@ class Environment {
      * @return $this
      */
     public function get($key){
-        #i: Check for wildcard key
+        /** Check for wildcard key */
         if( starts_with($key,['*::','::']) ){
             $key = str_replace(['*::','::'],'',$key);
         };
 
-        #i: Prepare the assets
+        /** Prepare the assets */
         $this->processing = $this->assets->get($this->key = $key);
 
-        #i: Immediate return on empty
+        /** Immediate return on empty */
         if( empty($this->processing) ) return $this;
 
-        #i: Configure target path for collection group
+        /** Configure target path for collection group */
         $file_extension = $this->config->get('core::asset.mimes')[$this->processing->mime][0];
         list($namespace,$group) = $this->assets->parseKey($this->key);
 
+        /** If namespace empty use group name */
         if(empty($namespace)) $namespace = $group;
 
-        #i: Set target path
+        /** Set target path */
         $this->processing->setTargetPath("$namespace.$file_extension");
 
         return $this;
@@ -93,11 +114,12 @@ class Environment {
 
     /**
      * Stream assets to client
+     *
      */
     public function stream(){
         if( empty($this->processing) ) echo null;
 
-        #i: Create response base on mime and assets item
+        /** Create response base on mime and assets item */
         $response = \Response::make($this->processing->dump(), 200);
         $response->header('Content-Type', 'text/'.$this->processing->mime);
 
@@ -112,17 +134,18 @@ class Environment {
      * @return array
      */
     public function html($assets=[]){
-        #i: Vars
+        /** Vars */
         $assets = empty($assets) ? $this->processing : $assets;
 
+        /** Immediate return on empty */
         if( empty($this->processing) ) return null;
 
         $mime = $this->processing->mime;
 
-        #i: write file to disk
+        /** write file to disk */
         $asset_files = $this->save($assets);
 
-        #i: Create html
+        /** Create html tag */
         array_walk($asset_files, function(&$asset) use($mime){
             if( $mime == 'javascript' ){
                 $asset = '<script src="'.$asset.'"></script>';
@@ -142,22 +165,22 @@ class Environment {
      * @return array
      */
     public function save($assets=[]){
-        #i: Assets assignment
+        /** Assets assignment */
         $assets = empty($assets) ? $this->items() : $assets;
 
         if( empty($this->processing) ) return [];
 
-        #i: Get build & relative path
+        /** Get build & relative path */
         $build_path = $this->config->get('core::asset.build_path');
         $relative_path = $this->helpers->string->relative_path(public_path(),$build_path);
 
-        #i: Check for production environment
+        /** Check for production environment */
         $is_production = in_array($this->environment, $this->config->get('core::asset.cache.environment'));
 
-        #i: Get asset writer
+        /** Get asset writer */
         $writer = new AssetWriter($build_path);
 
-        #i: Write to disk, production will create single file and cached
+        /** Write to disk, production will create single file and cached */
         if( $is_production ){
             $writer->writeAsset($assets);
             return [app('url')->asset($relative_path.$this->processing->getTargetPath())];
@@ -166,13 +189,13 @@ class Environment {
             $asset_files = [];
 
             foreach( $assets->dump() as $asset ){
-                #i: Create assets url collection
+                /** Create assets url collection */
                 $asset_files[] = app('url')->asset($relative_path.$asset->getTargetPath());
 
-                #i: If file exist skip write
+                /** If file exist skip write */
                 if( $this->files->exists($build_path.'/'.$asset->getTargetPath()) ) continue;
 
-                #i: Write to disk
+                /** Write to disk */
                 $writer->writeAsset($asset);
             }
 

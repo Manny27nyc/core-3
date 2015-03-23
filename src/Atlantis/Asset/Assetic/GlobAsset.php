@@ -1,4 +1,6 @@
-<?php namespace Atlantis\Asset\Assetic;
+<?php
+
+namespace Atlantis\Asset\Assetic;
 
 use Assetic\Asset\FileAsset;
 use Assetic\Util\VarUtils;
@@ -6,9 +8,21 @@ use Assetic\Filter\FilterInterface;
 
 
 class GlobAsset extends \Assetic\Asset\AssetCollection{
+    /** @var array Globs item */
     private $globs;
+
+    /** @var bool Init flag */
     private $initialized;
 
+
+    /**
+     * Contructor
+     *
+     * @param array $globs
+     * @param array $filters
+     * @param null $root
+     * @param array $vars
+     */
     public function __construct($globs, $filters = array(), $root = null, array $vars = array())
     {
         $this->globs = (array) $globs;
@@ -17,6 +31,12 @@ class GlobAsset extends \Assetic\Asset\AssetCollection{
         parent::__construct(array(), $filters, $root, $vars);
     }
 
+
+    /**
+     * Return all
+     *
+     * @return array
+     */
     public function all()
     {
         if (!$this->initialized) {
@@ -26,6 +46,12 @@ class GlobAsset extends \Assetic\Asset\AssetCollection{
         return parent::all();
     }
 
+
+    /**
+     * Load asset
+     *
+     * @param FilterInterface $additionalFilter
+     */
     public function load(FilterInterface $additionalFilter = null)
     {
         if (!$this->initialized) {
@@ -35,6 +61,13 @@ class GlobAsset extends \Assetic\Asset\AssetCollection{
         parent::load($additionalFilter);
     }
 
+
+    /**
+     * Dump asset
+     *
+     * @param FilterInterface $additionalFilter
+     * @return string
+     */
     public function dump(FilterInterface $additionalFilter = null)
     {
         if (!$this->initialized) {
@@ -44,6 +77,12 @@ class GlobAsset extends \Assetic\Asset\AssetCollection{
         return parent::dump($additionalFilter);
     }
 
+
+    /**
+     * Get last modified date
+     *
+     * @return int|null
+     */
     public function getLastModified()
     {
         if (!$this->initialized) {
@@ -53,6 +92,12 @@ class GlobAsset extends \Assetic\Asset\AssetCollection{
         return parent::getLastModified();
     }
 
+
+    /**
+     * Get iterator
+     *
+     * @return \RecursiveIteratorIterator|\Traversable
+     */
     public function getIterator()
     {
         if (!$this->initialized) {
@@ -62,12 +107,23 @@ class GlobAsset extends \Assetic\Asset\AssetCollection{
         return parent::getIterator();
     }
 
+
+    /**
+     * Set values
+     *
+     * @param array $values
+     */
     public function setValues(array $values)
     {
         parent::setValues($values);
         $this->initialized = false;
     }
 
+
+    /**
+     * Initialize
+     *
+     */
     private function initialize()
     {
         foreach ($this->globs as $glob) {

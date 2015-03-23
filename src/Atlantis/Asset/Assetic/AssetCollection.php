@@ -1,4 +1,6 @@
-<?php namespace Atlantis\Asset\Assetic;
+<?php
+
+namespace Atlantis\Asset\Assetic;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;

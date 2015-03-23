@@ -1,4 +1,6 @@
-<?php namespace Atlantis\Asset\Config;
+<?php
+
+namespace Atlantis\Asset\Config;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Config\LoaderInterface;
@@ -12,23 +14,27 @@ class AssetLoader implements LoaderInterface{
     protected $assets = [];
 
 
+    /**
+     * Constructor
+     * 
+     */
     public function __construct()
     {
-        #i: Get common assets and prefixes
+        /** Get common assets and prefixes */
         $assets = app('config')->get('core::asset.assets');
         $mimes = app('config')->get('core::asset.mimes');
         $prefixes = app('config')->get('core::asset.register.prefixes');
 
-        #i: If no common asset configured then skip
+        /** If no common asset configured then skip */
         if( empty($assets) ) return;
 
-        #i: Apply prefixes
+        /** Apply prefixes */
         $assets = app('atlantis.helpers')->string()->applyPrefixes($assets,$prefixes);
 
-        #i: Get and construct common asset types
+        /** Get and construct common asset types */
         $asset_types = array_keys($mimes);
         foreach( $asset_types as $asset_type){
-            #i: Create an AssetCollection of current asset
+            /** Create an AssetCollection of current asset */
             if( isset($assets[$asset_type]) ) $this->addNamespace('common',$assets);
         }
     }
@@ -44,27 +50,27 @@ class AssetLoader implements LoaderInterface{
      */
     public function load($environment, $group, $namespace = null)
     {
-        #i: If no namespace provide set default
+        /** If no namespace provide set default */
         $key = $this->getCollection($group,$namespace);
 
-        #i: Check for existing value
+        /** Check for existing value */
         if( isset($this->assets[$key]) ){
             return $this->assets[$key];
         }
 
-        #i: Check and get assets existed in hints array
+        /** Check and get assets existed in hints array */
         $assets = $this->exists($group,$namespace);
 
-        #i: If library not exist then return empty
+        /** If library not exist then return empty */
         if( !$assets ) return [];
 
-        #i: Get assets array
+        /** Get assets array */
         $assets_common = $this->parseAssetsArray($assets,$group);
 
-        #i: Assign parse asset to assets collection
+        /** Assign parse asset to assets collection */
         $this->assets[$key] = $assets_common;
 
-        #i: Return to repo dispatcher
+        /** Return to repo dispatcher */
         return $assets_common;
     }
 
@@ -78,14 +84,14 @@ class AssetLoader implements LoaderInterface{
      */
     protected function parseAssetsArray($assets,$group)
     {
-        #i: Get default asset config
+        /** Get default asset config */
         $assets_default = isset($assets['default']) ? $assets['default'] : app('config')->get('core::asset.assets.default');
 
-        #i: Construct mime class base collection class
+        /** Construct mime class base collection class */
         $asset_class = 'Atlantis\\Asset\\Collection\\'.studly_case($group);
         if( !class_exists($asset_class) ) return [];
 
-        #i: Create an AssetCollection of current asset
+        /** Create an AssetCollection of current asset */
         $assets_common = App::make($asset_class, [$assets[$group],[],$assets_default['path']]);
 
         return $assets_common;
@@ -101,19 +107,19 @@ class AssetLoader implements LoaderInterface{
      */
     public function exists($group, $namespace = null)
     {
-        #i: Get key to check hints array
+        /** Get key to check hints array */
         $key = $this->getCollection($group,$namespace);
 
         if( isset($this->assets[$key]) ) return $this->assets[$key];
 
-        #i: Check value in array
+        /** Check value in array */
         if( is_null($namespace) ){
             $merge_assets = [];
             foreach($this->getNamespaces() as $namespace){
                 $current_assets = array_get($this->hints,"$namespace.$group");
                 $current_assets_path = array_get($this->hints,"$namespace.default.path");
 
-                #i: Skip if asset key not exist
+                /** Skip if asset key not exist */
                 if( is_null($current_assets) ) continue;
 
                 foreach($current_assets as &$asset){
@@ -155,6 +161,7 @@ class AssetLoader implements LoaderInterface{
         $this->hints[$namespace] = $hint;
     }
 
+
     /**
      * Returns all registered namespaces with the config
      * loader.
@@ -165,6 +172,7 @@ class AssetLoader implements LoaderInterface{
     {
         return array_keys($this->hints);
     }
+
 
     /**
      * Apply any cascades to an array of package options.
