@@ -64,4 +64,47 @@ class BaseModel extends Eloquent {
         return null;
     }
 
+
+    /**
+     *
+     * @param $query
+     * @param array $columns
+     */
+    public function scopeFiltering($query,$columns=array()){
+        foreach($columns as $column => $value){
+            $relations =  explode('.',$column);
+            $field = array_pop($relations);
+            $relation = head($relations);
+
+            if( count($relations) > 0 ){
+                $query->whereHas($relation, function($q) use($relations,$field,$value){
+                    $relation = array_pop($relations);
+                    if( count($relations) == 0 ){
+                        $q->where($field,'LIKE',$value.'%');
+
+                    }else{
+                        $q->whereHas($relation, function($q) use($relations,$field,$value){
+                            $relation = array_pop($relations);
+                            if( count($relations) == 0 ){
+                                $q->where($field,'LIKE',$value.'%');
+
+                            }else{
+                                $q->whereHas($relation, function($q) use($relations,$field,$value){
+                                    $relation = array_pop($relations);
+                                    if( count($relations) == 0 ){
+                                        $q->where($field,'LIKE',$value.'%');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+            }else{
+                /** Filtering normal columns */
+                $query->where($field,'LIKE',$value.'%');
+            }
+        }
+    }
+
 }
