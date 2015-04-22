@@ -51,8 +51,8 @@ class CoreServiceProvider extends ServiceProvider {
 	{
         $this->registerDependencies();
         $this->registerCoreServices();
-        $this->registerServiceModule();
         $this->registerServiceTheme();
+        $this->registerServiceModule();
         $this->registerServiceHelpers();
         $this->registerCommands();
         $this->registerAlias();
@@ -69,8 +69,8 @@ class CoreServiceProvider extends ServiceProvider {
         $this->package('atlantis/core');
 
         #i: Boot loading
-        $this->startLoadModules();
         $this->startLoadSupport();
+        $this->startLoadModules();
 
         #e: Event trigger
         $this->app['events']->fire('atlantis.core.ready');
@@ -228,7 +228,7 @@ class CoreServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('atlantis.helpers','atlantis.module','atlantis.theme');
+		return array('atlantis.helpers','atlantis.theme','atlantis.module');
 	}
 
 }
