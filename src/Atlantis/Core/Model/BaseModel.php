@@ -19,12 +19,12 @@ class BaseModel extends Eloquent {
     public function getAttribute($key){
         $value_original = null;
 
-        #i: Parent original value
+        /** Parent original value */
         if( parent::getAttribute($key) ){
             $value_original = parent::getAttribute($key);
         }
 
-        #i: Context Reaction, AttributeSet
+        /** Context Reaction, AttributeSet */
         if( class_exists('\\Atlantis\\Context\\ContextServiceProvider') ){
             $context_value = $this->getContextReaction($key,$value_original);
             if( $context_value ) $value_original = $context_value;
@@ -41,10 +41,10 @@ class BaseModel extends Eloquent {
      * @return null
      */
     protected function getContextReaction($key,$value){
-        #i: Get context
+        /** Get context */
         $contexts = app('context')->all();
 
-        #i: Check if Reaction Contexts exist for this model
+        /** Check if Reaction Contexts exist for this model */
         $context = Arrays::find($contexts, function($value){
             if( $value->status == 0 ) return false;
 
@@ -52,12 +52,12 @@ class BaseModel extends Eloquent {
         });
 
 
-        #i: Inspect reaction context for this model
+        /** Inspect reaction context for this model */
         if($context){
-            #i: Inspect context
+            /** Inspect context */
             $value = app('context')->reactionInspect($context->reaction_provider,[$this,$key,$value,$context->reaction_parameters]);
 
-            #i: Override value
+            /** Override value */
             if($value) return $value;
         }
 
@@ -66,6 +66,7 @@ class BaseModel extends Eloquent {
 
 
     /**
+     * Scope Filtering
      *
      * @param $query
      * @param array $columns
@@ -83,6 +84,17 @@ class BaseModel extends Eloquent {
                         $q->where($field,'LIKE',$value.'%');
 
                     }else{
+                        /*array_reduce($array_column, function(&$collector,$item) use($field_last, $field, $value){
+                            $collector->whereHas($item, function($query) use(&$collector, $item, $field_last, $field, $value){
+                                if($item == $field_last){
+                                    $query->where($field,'LIKE',$value.'%');
+                                }
+                                $collector = $query;
+                            });
+
+                            return $collector;
+                        },$query);*/
+
                         $q->whereHas($relation, function($q) use($relations,$field,$value){
                             $relation = array_pop($relations);
                             if( count($relations) == 0 ){
@@ -104,6 +116,31 @@ class BaseModel extends Eloquent {
                 /** Filtering normal columns */
                 $query->where($field,'LIKE',$value.'%');
             }
+        }
+    }
+
+
+    /**
+     * Meta Attribute
+     *
+     * @param $value
+     * @return mixed
+     */
+    public function getMetaAttribute($value){
+        if( empty($value) ) $value = '{}';
+        return json_decode($value);
+    }
+
+
+    /**
+     * Meta Attribute
+     * @param $value
+     */
+    public function setMetaAttribute($value){
+        if( is_array($value) || is_object($value) ){
+            $this->attributes['meta'] = json_encode($value);
+        }else{
+            $this->attributes['meta'] = $value;
         }
     }
 
