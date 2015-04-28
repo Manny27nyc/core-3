@@ -78,7 +78,10 @@ abstract class ServiceProviderFactory extends BaseServiceProviderFactory{
             $route_options = $this->app['config']->get("modules.{$this->module_name}::api.router.routes.$route_name.options");
 
             $this->app['router']->api(['version' => 'v1','prefix' => 'api', 'before'=>'api.rpc'], function() use($key,$route_options){
-                $this->app['router']->post($route_options['route'].'/{method?}',"{$key}@actions");
+                $controller = $route_options['defaults']['controller'];
+                $action = $route_options['defaults']['action'];
+
+                $this->app['router']->post($route_options['route'].'/{'.$action.'?}',"{$controller}@actions");
             });
         }
     }
