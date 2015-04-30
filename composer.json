@@ -13,7 +13,7 @@
         "php": ">=5.4",
         "illuminate/support": "~4.2.0",
         "firephp/firephp-core": "dev-master",
-        "rhumsaa/uuid": "2.7.*@dev",
+        "ramsey/uuid": "3.0.*@dev",
         "anahkiasen/former": "3.5.*@dev",
         "anahkiasen/underscore-php" : "*",
         "kriswallsmith/assetic": "1.*",
@@ -35,7 +35,8 @@
             "Atlantis\\Core\\": "src/",
             "Atlantis\\Api\\": "src/",
             "Atlantis\\Asset\\": "src/",
-            "Atlantis\\Helpers\\": "src/"
+            "Atlantis\\Helpers\\": "src/",
+            "Atlantis\\Language\\": "src/"
         }
     },
     "minimum-stability": "dev",
