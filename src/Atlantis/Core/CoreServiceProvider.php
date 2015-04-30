@@ -97,6 +97,7 @@ class CoreServiceProvider extends ServiceProvider {
         $this->app->register('Atlantis\Api\ServiceProvider');
         $this->app->register('Atlantis\Asset\ServiceProvider');
         $this->app->register('Atlantis\Core\Client\ServiceProvider');
+        $this->app->register('Atlantis\Language\Provider\Laravel');
     }
 
 
