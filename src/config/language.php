@@ -17,7 +17,8 @@
                 'User [%email%] has been suspended.' => 'Pengguna sistem dengan login [%email%] telah di gantung',
                 'The password attribute is required.' => 'Sila masukkan katalaluan',
                 'The [email] attribute is required.' => 'Sila masukkan email',
-                'A user could not be found with a login value of [%email%].' => 'Pengguna dengan login [%email%] tiada dalam sistem'
+                'A user could not be found with a login value of [%email%].' => 'Pengguna dengan login [%email%] tiada dalam sistem',
+                'Cannot login user [%email%] as they are not activated.' => 'Pengguna dengan [%email%] belum diaktifkan.'
             ]
         ]
 
